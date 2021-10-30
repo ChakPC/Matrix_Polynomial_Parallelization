@@ -4,13 +4,13 @@ using namespace std;
 
 // Function to compute powers of input matrix till exponent limit
 // Brute Force Implmentation: O(limit * n * n)
-vector<vector<vector<complex<double>>>> computePowers(vector<vector<complex<double>>> &inputMatrix, int limit){
+vector<complexMatrix> computePowers(complexMatrix &inputMatrix, int limit){
     int sz = inputMatrix.size();
-    vector<vector<vector<complex<double>>>> res(limit+1, vector<vector<complex<double>>>(sz, vector<complex<double>>(sz, complex<double>(0.0, 0.0))));
-    vector<vector<complex<double>>> temp = inputMatrix;
-    vector<vector<complex<double>>> identity(sz, vector<complex<double>>(sz, complex<double>(0.0, 0.0)));
+    vector<complexMatrix> res(limit+1, complexMatrix(sz, vector<complexNumber>(sz, complexNumber(0.0, 0.0))));
+    complexMatrix temp = inputMatrix;
+    complexMatrix identity(sz, vector<complexNumber>(sz, complexNumber(0.0, 0.0)));
     for(int i = 0; i < sz; i++){
-        identity[i][i] = complex<double>(1.0, 0.0);
+        identity[i][i] = complexNumber(1.0, 0.0);
     }
     res[0] = identity;
     res[1] = inputMatrix;
@@ -22,27 +22,27 @@ vector<vector<vector<complex<double>>>> computePowers(vector<vector<complex<doub
 }
 
 // Serial Implementation of Paterson Stockmeyer
-vector<vector<complex<double>>> patersonStockmeyerSerial(vector<vector<complex<double>>> &inputMatrix, vector<complex<double>> &coefficients, int polynomialVariable, int polynomialDegree){
+complexMatrix patersonStockmeyerSerial(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree){
     int inputMatrixSize = inputMatrix.size();
     int degree = coefficients.size() - 1;
 
     // Compute powers of A till p
-    vector<vector<vector<complex<double>>>> powersOfInputMatrix = computePowers(inputMatrix, polynomialVariable);
+    vector<complexMatrix> powersOfInputMatrix = computePowers(inputMatrix, polynomialVariable);
 
     // Declare resultant matrix
-    vector<vector<complex<double>>> resultantMatrix(inputMatrixSize, vector<complex<double>>(inputMatrixSize, complex<double>(0.0, 0.0)));
+    complexMatrix resultantMatrix(inputMatrixSize, vector<complexNumber>(inputMatrixSize, complexNumber(0.0, 0.0)));
 
     // Horner's loop
     for(int q = polynomialDegree-1; q >= 0; q--){
-        vector<vector<complex<double>>> temp(inputMatrixSize, vector<complex<double>>(inputMatrixSize, complex<double>(0.0, 0.0)));
+        complexMatrix temp(inputMatrixSize, vector<complexNumber>(inputMatrixSize, complexNumber(0.0, 0.0)));
         for(int j = 0; j < polynomialVariable; j++){
-            complex<double> coeff = {0.0, 0.0};
+            complexNumber coeff = {0.0, 0.0};
             int index = polynomialVariable * q + j;
             if(j <= degree) coeff = coefficients[index];
-            vector<vector<complex<double>>> adder = coeff * powersOfInputMatrix[j];
+            complexMatrix adder = coeff * powersOfInputMatrix[j];
             temp = temp + adder;
         }
-        vector<vector<complex<double>>> adder = resultantMatrix * powersOfInputMatrix[polynomialVariable];
+        complexMatrix adder = resultantMatrix * powersOfInputMatrix[polynomialVariable];
         resultantMatrix = adder + temp;
     }
 
@@ -55,7 +55,7 @@ int main() {
     // Take Input
     int n;
     cin >> n;
-    vector<vector<complex<double>>> A(n, vector<complex<double>>(n, {0.0, 0.0}));
+    complexMatrix A(n, vector<complexNumber>(n, {0.0, 0.0}));
     for(int i=0; i<n; i++){
         for(int j=0; j<n; j++){
             double a, b;
@@ -65,13 +65,13 @@ int main() {
     }
     int d;
     cin >> d;
-    vector<complex<double>> coeff(d+1, {0.0, 0.0});
+    vector<complexNumber> coeff(d+1, {0.0, 0.0});
     for(int i=0; i<=d; i++){
         double a, b;
         cin >> a >> b;
         coeff[i] = {a, b};
     }
-    vector<vector<complex<double>>> res = patersonStockmeyerSerial(A, coeff, sqrt(d)+1, sqrt(d)+1);
+    complexMatrix res = patersonStockmeyerSerial(A, coeff, sqrt(d)+1, sqrt(d)+1);
     printMatrix(res);
     return 0;
 }
