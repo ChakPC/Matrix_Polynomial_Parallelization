@@ -57,7 +57,7 @@ vector<vector<vector<complex<double>>>> computePowers(vector<vector<complex<doub
     }
     res[0] = identity;
     res[1] = inputMatrix;
-    for(int i=2; i<=limit; i++){
+    for (int i = 2; i <= limit; i++) {
         temp = temp * inputMatrix;
         res[i] = temp;
     }
@@ -92,7 +92,7 @@ vector<vector<complex<double>>> patersonStockmeyerSerial(vector<vector<complex<d
     return resultantMatrix;
 }
 
-int main(){
+int main() {
     // Take Input
     int n;
     cin >> n;
