@@ -31,9 +31,12 @@ vector<complexMatrix> computeQR(complexMatrix& inputMatrix) {
     for (int i = 1; i < sizeOfMatrix; i++) {
         for (int j = 0; j < i; j++) {
             auto G = computeGivens(i, j, sizeOfMatrix, inputMatrix[i][j], inputMatrix[j][j]);
-            QTranspose = QTranspose * G;
+            // printf("\nG: %d, %d \n", i, j);
+            // printMatrix(G);
+            QTranspose = G * QTranspose;
         }
     }
+    // printMatrix(QTranspose);
 
     // Compute Q and R
     complexMatrix Q = transposeMatrix(QTranspose);
@@ -47,11 +50,42 @@ complexMatrix schurDecompositionSerial(complexMatrix& inputMatrix, int numberOfI
         auto QR_Vector = computeQR(inputMatrix);
         auto Q = QR_Vector[0];
         auto R = QR_Vector[1];
+        // printf("\nQ\n");
+        // printMatrix(Q);
+        // printf("\nR\n");
+        // printMatrix(R);
         inputMatrix = R * Q;
     }
 
     return inputMatrix;
 }
+// A = Qh * U * Q
+// Q: unitary matrix
+// Q * Qh = I
+// Qh: conjugate transpose of Q
+// QR method
+// A0 = A
+// A0 => Q0 * R0
+// R0 * Q0 => A1
+// A1 => Q1 * R1
+// R1 * Q1 => A2
+//....A = U
+// Gram Schmidt
+// ....
+// Givens Rotations
+/*
+[[1 2 3]
+ [4 5 6]
+ [7 8 9]]
+
+theta = atan(-Aij / Ajj)
+
+G(i, j, theta)
+=[[]
+  []
+  []]
+
+*/
 
 // Driver function for testing
 int main() {
@@ -66,7 +100,9 @@ int main() {
             A[i][j] = {a, b};
         }
     }
-    complexMatrix t = schurDecompositionSerial(A, 50);
+    complexMatrix t = schurDecompositionSerial(A, 10);
     printMatrix(t);
+    // complexMatrix t = computeGivens(2, 1, 3, complexNumber(8, 0), complexNumber(5, 0));
+    // printMatrix(t);
     return 0;
 }
