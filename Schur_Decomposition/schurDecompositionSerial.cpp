@@ -38,7 +38,7 @@ vector<complexMatrix> computeQR(complexMatrix &inputMatrix)
             R = G*R;
         }
     }
-    
+
     // Compute Q and R
     complexMatrix Q = transposeMatrix(QTranspose);
     return {Q, R};
