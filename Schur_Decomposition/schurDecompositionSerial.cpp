@@ -45,17 +45,19 @@ vector<complexMatrix> computeQR(complexMatrix &inputMatrix)
 }
 
 // Function to perform iterations of Schur Decomposition
-complexMatrix schurDecompositionSerial(complexMatrix &inputMatrix, int numberOfIterations)
+vector<complexMatrix> schurDecompositionSerial(complexMatrix &inputMatrix, int numberOfIterations)
 {
+    complexMatrix Q, R;
+    complexMatrix QFinal = identityMatrix(inputMatrix.size());
     for (int i = 0; i < numberOfIterations; i++)
     {
-        auto QR_Vector = computeQR(inputMatrix);
-        auto Q = QR_Vector[0];
-        auto R = QR_Vector[1];
+        vector<complexMatrix> QR_Vector = computeQR(inputMatrix);
+        Q = QR_Vector[0];
+        R = QR_Vector[1];
         inputMatrix = R * Q;
+        QFinal = QFinal * Q;
     }
-
-    return inputMatrix;
+    return {transposeMatrix(QFinal), inputMatrix};
 }
 
 // Driver function for testing
@@ -74,7 +76,15 @@ int main()
             A[i][j] = {a, b};
         }
     }
-    complexMatrix t = schurDecompositionSerial(A, 10);
-    printMatrix(t);
+    vector<complexMatrix> t = schurDecompositionSerial(A, 10);
+    printf("\n Q: \n");
+    printMatrix(t[0]);
+    printf("\n Ak: \n");
+    printMatrix(t[1]);
+    complexMatrix temp = transposeMatrix(t[0]);
+    temp = temp * t[1];
+    temp = temp * t[0];
+    printf("\n res: \n");
+    printMatrix(temp);
     return 0;
 }
