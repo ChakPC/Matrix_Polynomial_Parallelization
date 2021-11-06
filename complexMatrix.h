@@ -47,8 +47,9 @@ inline complexMatrix operator*(complexMatrix &A, complexMatrix &B){
 // Function to print complex matrix
 inline void printMatrix(complexMatrix &res){
     int n = res.size();
+    int m = res[0].size();
     for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
+        for(int j=0; j<m; j++){
             cout << "( " << real(res[i][j]) <<" ) + i( "<< imag(res[i][j]) <<" )  ";
         }
         cout << "\n";
@@ -171,7 +172,7 @@ inline complexNumber determinant(complexMatrix A, int n){
 inline complexMatrix adjoint(complexMatrix &A){
     complexMatrix adj(A.size(), vector<complexNumber>(A.size(), complexNumber(0, 0)));
 	if (A.size() == 1){
-		adj[0][0] = 1;
+		adj[0][0] = complexNumber(1, 0);
 		return adj;
 	}
     complexMatrix temp(A.size(), vector<complexNumber>(A.size(), complexNumber(0, 0)));
@@ -192,6 +193,7 @@ inline complexMatrix inverse(complexMatrix A)
 {
     complexMatrix inverse(A.size(), vector<complexNumber>(A.size(), complexNumber(0, 0)));
 	complexNumber det = determinant(A, A.size());
+    cout << "\n Det: " << real(det) <<" " << imag(det) <<"\n";
 	complexMatrix adj = adjoint(A);
 	for (int i=0; i<A.size(); i++)
 		for (int j=0; j<A.size(); j++)
