@@ -6,12 +6,12 @@ using namespace std;
 #define complexNumber complex<double>
 #define complexMatrix vector<vector<complexNumber>>
 
-// + operaotr overloaded to add two complex matrices
+// + operator overloaded to add two complex matrices
 inline complexMatrix operator+(complexMatrix &A, complexMatrix &B) {
-    int size = A.size();
-    complexMatrix res(size, vector<complexNumber>(size, complexNumber(0.0, 0.0)));
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
+    int row = A.size(), col = A[0].size();
+    complexMatrix res(row, vector<complexNumber>(col, complexNumber(0.0, 0.0)));
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
             res[i][j] = A[i][j] + B[i][j];
         }
     }
@@ -20,10 +20,10 @@ inline complexMatrix operator+(complexMatrix &A, complexMatrix &B) {
 
 // * operator overloaded to multiply a complex number with a complex matrix
 inline complexMatrix operator*(complexNumber coeff, complexMatrix &matrix) {
-    int size = matrix.size();
-    complexMatrix res(size, vector<complexNumber>(size, {0.0, 0.0}));
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
+    int row = matrix.size(), col = matrix[0].size();
+    complexMatrix res(row, vector<complexNumber>(col, {0.0, 0.0}));
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
             res[i][j] = coeff * matrix[i][j];
         }
     }
@@ -32,11 +32,11 @@ inline complexMatrix operator*(complexNumber coeff, complexMatrix &matrix) {
 
 // * operator overloaded to multiply two complex matrices
 inline complexMatrix operator*(complexMatrix &A, complexMatrix &B) {
-    int size = A.size();
-    complexMatrix res(size, vector<complexNumber>(size, {0.0, 0.0}));
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            for (int k = 0; k < size; k++) {
+    int rowA = A.size(), colA = A[0].size(), rowB = B.size(), colB = B[0].size();
+    complexMatrix res(rowA, vector<complexNumber>(colB, {0.0, 0.0}));
+    for (int i = 0; i < rowA; i++) {
+        for (int j = 0; j < colB; j++) {
+            for (int k = 0; k < colA; k++) {
                 res[i][j] = res[i][j] + A[i][k] * B[k][j];
             }
         }
