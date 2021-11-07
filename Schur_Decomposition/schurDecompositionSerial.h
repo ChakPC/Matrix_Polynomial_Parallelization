@@ -4,7 +4,7 @@ using namespace std;
 
 // Function to compute Givens matrix for given i, j
 // Theta computed as such that after rotation, the value at (i, j) becomes 0
-complexMatrix computeGivens(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj)
+inline complexMatrix computeGivens(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj)
 {
     // Compute theta
     complexNumber theta = atan((complexNumber(-1.0, 0.0) * Aij) / Ajj);
@@ -24,7 +24,7 @@ complexMatrix computeGivens(int i, int j, int sizeOfMatrix, complexNumber Aij, c
     return Givens;
 }
 
-vector<complexMatrix> computeQR(complexMatrix &inputMatrix)
+inline vector<complexMatrix> computeQR(complexMatrix &inputMatrix)
 {
     int sizeOfMatrix = inputMatrix.size();
     complexMatrix R=inputMatrix;
@@ -45,7 +45,7 @@ vector<complexMatrix> computeQR(complexMatrix &inputMatrix)
 }
 
 // Function to perform iterations of Schur Decomposition
-vector<complexMatrix> schurDecompositionSerial(complexMatrix &inputMatrix, int numberOfIterations)
+inline vector<complexMatrix> schurDecompositionSerial(complexMatrix &inputMatrix, int numberOfIterations)
 {
     complexMatrix Q, R;
     complexMatrix QFinal = identityMatrix(inputMatrix.size());
@@ -60,31 +60,3 @@ vector<complexMatrix> schurDecompositionSerial(complexMatrix &inputMatrix, int n
     return {transposeMatrix(QFinal), inputMatrix};
 }
 
-// Driver function for testing
-int main()
-{
-    // Take Input
-    int n;
-    cin >> n;
-    complexMatrix A(n, vector<complexNumber>(n, {0.0, 0.0}));
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            double a, b;
-            cin >> a >> b;
-            A[i][j] = {a, b};
-        }
-    }
-    vector<complexMatrix> t = schurDecompositionSerial(A, 10);
-    printf("\n Q: \n");
-    printMatrix(t[0]);
-    printf("\n Ak: \n");
-    printMatrix(t[1]);
-    complexMatrix temp = transposeMatrix(t[0]);
-    temp = temp * t[1];
-    temp = temp * t[0];
-    printf("\n res: \n");
-    printMatrix(temp);
-    return 0;
-}

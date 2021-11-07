@@ -4,7 +4,7 @@ using namespace std;
 
 // Function to compute powers of input matrix till exponent limit
 // Brute Force Implmentation: O(limit * n * n)
-vector<complexMatrix> computePowers(complexMatrix &inputMatrix, int limit){
+inline vector<complexMatrix> computePowers(complexMatrix &inputMatrix, int limit){
     int sz = inputMatrix.size();
     vector<complexMatrix> res(limit+1, complexMatrix(sz, vector<complexNumber>(sz, complexNumber(0.0, 0.0))));
     complexMatrix temp = inputMatrix;
@@ -22,7 +22,7 @@ vector<complexMatrix> computePowers(complexMatrix &inputMatrix, int limit){
 }
 
 // Serial Implementation of Paterson Stockmeyer
-complexMatrix patersonStockmeyerSerial(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree){
+inline complexMatrix patersonStockmeyerSerial(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree){
     int inputMatrixSize = inputMatrix.size();
     int degree = coefficients.size() - 1;
 
@@ -50,28 +50,3 @@ complexMatrix patersonStockmeyerSerial(complexMatrix &inputMatrix, vector<comple
     return resultantMatrix;
 }
 
-// Driver function for testing
-int main() {
-    // Take Input
-    int n;
-    cin >> n;
-    complexMatrix A(n, vector<complexNumber>(n, {0.0, 0.0}));
-    for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-            double a, b;
-            cin >> a >> b;
-            A[i][j] = {a, b};
-        }
-    }
-    int d;
-    cin >> d;
-    vector<complexNumber> coeff(d+1, {0.0, 0.0});
-    for(int i=0; i<=d; i++){
-        double a, b;
-        cin >> a >> b;
-        coeff[i] = {a, b};
-    }
-    complexMatrix res = patersonStockmeyerSerial(A, coeff, sqrt(d)+1, sqrt(d)+1);
-    printMatrix(res);
-    return 0;
-}
