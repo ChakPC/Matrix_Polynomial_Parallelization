@@ -1,3 +1,4 @@
+#include "../complexMatrix.h"
 #include "schurDecompositionSerial.h"
 
 // Driver function for testing

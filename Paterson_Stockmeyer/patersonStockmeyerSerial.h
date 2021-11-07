@@ -1,6 +1,4 @@
-// Serial Implementation of Paterson - Stockmeyer algorithm
-#include "../complexMatrix.h"
-using namespace std;
+// Header file for serial Implementation of Paterson - Stockmeyer algorithm
 
 // Function to compute powers of input matrix till exponent limit
 // Brute Force Implmentation: O(limit * n * n)

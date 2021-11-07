@@ -1,4 +1,4 @@
-#include "../complexMatrix.h"
+// Header file for serial Implementation of Sylvester Equation Solver
 
 // Function to compute K = Iq * A - B.T * Ip
 // * denotes kronecker product

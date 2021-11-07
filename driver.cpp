@@ -1,8 +1,9 @@
-#include "../complexMatrix.h"
-#include "patersonStockmeyerSerial.h"
+#include "complexMatrix.h"
+#include "Paterson_Stockmeyer/patersonStockmeyerSerial.h"
+#include "Schur_Decomposition/schurDecompositionSerial.h"
+#include "Sylvester_Equation_Solver/sylvesterEquationSolverSerial.h"
 
-// Driver function for testing
-int main() {
+int main(){
     // Take Input
     int n;
     cin >> n;
@@ -22,8 +23,7 @@ int main() {
         cin >> a >> b;
         coeff[i] = {a, b};
     }
-    complexMatrix res = patersonStockmeyerSerial(A, coeff, sqrt(d)+1, sqrt(d)+1);
-    printMatrix(res);
+    
+
     return 0;
 }
-

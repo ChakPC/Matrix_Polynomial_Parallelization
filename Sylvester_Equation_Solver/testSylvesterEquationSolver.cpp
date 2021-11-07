@@ -1,3 +1,4 @@
+#include "../complexMatrix.h"
 #include "sylvesterEquationSolverSerial.h"
 
 // Driver function

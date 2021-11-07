@@ -1,6 +1,4 @@
-// Serial Implementation of Schur Decomposition
-#include "../complexMatrix.h"
-using namespace std;
+// Header file for serial Implementation of Schur Decomposition
 
 // Function to compute Givens matrix for given i, j
 // Theta computed as such that after rotation, the value at (i, j) becomes 0
