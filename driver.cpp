@@ -55,10 +55,15 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
     complexMatrix T = schur[1];
 
     // Compute function for diagonal elements
-    int size = Q.size();
-    for(int i=0; i<size; i++){
-        if(i + 1 < size && abs(real(Q[i+1][i])) > 1e-15 && abs(imag(Q[i+1][i])) > 1e-15){
-
+    pair<int,map<pair<int,int> , complexMatrix>> res = constructBlocks(T);
+    int numOfBlocks = res.first;
+    map<pair<int,int> , complexMatrix> blocks = res.second;
+    int size = A.size();
+    complexMatrix functionOnT(size,vector<complexNumber>(size,complexNumber(0,0)));
+    for(int i=1;i<=numOfBlocks;i++){
+        complexMatrix computedBlock = patersonStockmeyerSerial(blocks[{i,i}], coeff, PS_p, PS_s);
+        if(computedBlock.size()){
+            
         }
     }
 }
