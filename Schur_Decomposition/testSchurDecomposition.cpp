@@ -21,10 +21,5 @@ int main()
     printMatrix(t[0]);
     printf("\n Ak: \n");
     printMatrix(t[1]);
-    complexMatrix temp = transposeMatrix(t[0]);
-    temp = temp * t[1];
-    temp = temp * t[0];
-    printf("\n res: \n");
-    printMatrix(temp);
     return 0;
 }
