@@ -47,6 +47,7 @@ inline complexMatrix operator*(complexMatrix &A, complexMatrix &B) {
 // Function to print complex matrix
 inline void printMatrix(complexMatrix &res) {
     int n = res.size();
+    if(n==0) return;
     int m = res[0].size();
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
