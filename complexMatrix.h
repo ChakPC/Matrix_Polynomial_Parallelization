@@ -133,7 +133,8 @@ inline complexMatrix reverseStacking(complexMatrix &inputMatrix, int rows) {
     return res;
 }
 
-void updateRow(complexMatrix &A, complexMatrix &B, int i, int j) {
+// Function to update a row for gauss elimination
+inline void updateRow(complexMatrix &A, complexMatrix &B, int i, int j) {
     int size = A.size();
     if (A[i][i] == complexNumber(0, 0)) {
         int candidateRow = -1;
@@ -144,7 +145,7 @@ void updateRow(complexMatrix &A, complexMatrix &B, int i, int j) {
             }
         }
         if (candidateRow == -1) {
-            cout << "Sylvester Equation Not solvable :)";
+            cout << "Sylvester Equation Not solvable :(";
             exit(0);
         }
         swap(A[i], A[candidateRow]);
@@ -153,16 +154,16 @@ void updateRow(complexMatrix &A, complexMatrix &B, int i, int j) {
     complexNumber factor = A[j][i] / A[i][i];
     for (int col = 0; col < size; col++) {
         A[j][col] = A[j][col] - (factor * A[i][col]);
-        B[j][0] = B[j][0] - (factor * B[i][0]);
     }
+    B[j][0] = B[j][0] - (factor * B[i][0]);
 }
 
+// Function to perform Gauss Elimination
 inline complexMatrix gaussElimination(complexMatrix &A, complexMatrix &B) {
     // Ax = B
     int size = A.size();
     for (int i = 0; i < size - 1; i++) {
         for (int j = i + 1; j < size; j++) {
-            // Rj -> Rj - (A[j][i]/A[i][i])*Ri;
             updateRow(A, B, i, j);
         }
     }

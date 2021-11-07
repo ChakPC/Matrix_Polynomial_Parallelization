@@ -1,3 +1,5 @@
 /.vscode
 /Paterson_Stockmeyer/test
 /Schur_Decomposition/test
+/Schur_Reordering/test
+/Sylvester_Equation_Solver/test
