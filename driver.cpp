@@ -13,7 +13,7 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
     // Compute function for diagonal elements
     int size = Q.size();
     for(int i=0; i<size; i++){
-        if(i + 1 < size && abs(real(Q[i+1][i])) > 1e-15 && abs(real(Q[i+1][i])) > 1e-15){
+        if(i + 1 < size && abs(real(Q[i+1][i])) > 1e-5 && abs(imag(Q[i+1][i])) > 1e-5){
 
         }
     }
