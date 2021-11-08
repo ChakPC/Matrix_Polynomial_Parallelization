@@ -15,8 +15,8 @@ tuple<int, map<pair<int, int>, complexMatrix>, map<pair<int, int>, pair<int, int
     int count = 0;
     for (int i = 0; i < size; i++) {
         count++;
-        if(i + 1 < size && ((abs(real(inputMatrix[i+1][i])) > zeroLimit) || (abs(imag(inputMatrix[i+1][i])) > zeroLimit))){
-            complexMatrix block(2,vector<complexNumber>(2));
+        if (i + 1 < size && ((abs(real(inputMatrix[i + 1][i])) > zeroLimit) || (abs(imag(inputMatrix[i + 1][i])) > zeroLimit))) {
+            complexMatrix block(2, vector<complexNumber>(2));
             block[0][0] = inputMatrix[i][i];
             block[0][1] = inputMatrix[i][i + 1];
             block[1][0] = inputMatrix[i + 1][i];
@@ -60,10 +60,6 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
     vector<complexMatrix> schur = schurDecompositionSerial(A, numOfIterations);
     complexMatrix Q = schur[0];
     complexMatrix T = schur[1];
-    cout << "\nQ:\n";
-    printMatrix(Q);
-    cout << "\nT:\n";
-    printMatrix(T);
 
     // Divide matri xinto blocks
     map<pair<int, int>, complexMatrix> computedBlocks;
@@ -71,16 +67,11 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
     int numOfBlocks = get<0>(res);
     map<pair<int, int>, complexMatrix> blocks = get<1>(res);
     map<pair<int, int>, pair<int, int>> limits = get<2>(res);
-    cout << "\n No. of blocks: " << numOfBlocks << "\n";
-    for(auto i: blocks){
-        cout << "\nBlock " << i.first.first << " " << i.first.second << ": \n";
-        printMatrix(i.second);
-    }
 
     // Compute function for diagonal blocks using Paterson Stockmeyer
     int size = A.size();
-    for(int i=1;i<=numOfBlocks;i++){
-        complexMatrix computedBlock = patersonStockmeyerSerial(blocks[{i,i}], coeff, PS_p, PS_s);
+    for (int i = 1; i <= numOfBlocks; i++) {
+        complexMatrix computedBlock = patersonStockmeyerSerial(blocks[{i, i}], coeff, PS_p, PS_s);
         processZero(computedBlock);
         computedBlocks[{i, i}] = computedBlock;
     }
@@ -107,11 +98,6 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
         }
     }
 
-    for(auto i: computedBlocks){
-        cout << "\nComputed Block " << i.first.first << " " << i.first.second << ": \n";
-        printMatrix(i.second);
-    }
-
     // Resultant function matrix for quasi upper triangular matrix
     complexMatrix functionOnT(size, vector<complexNumber>(size, complexNumber(0, 0)));
     for (int i = 1; i <= numOfBlocks; i++) {
@@ -120,19 +106,16 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
             int colStart = limits[{j, j}].second;
             int row = computedBlocks[{i, j}].size();
             int col = computedBlocks[{i, j}][0].size();
-            for(int x = rowStart; x < rowStart + row; x++){
-                for(int y = colStart; y < colStart + col; y++){
-                    functionOnT[x][y] = computedBlocks[{i, j}][x-rowStart][y-colStart];
-                    if(abs(real(functionOnT[x][y])) < 1e-5 && abs(imag(functionOnT[x][y])) < 1e-5){
+            for (int x = rowStart; x < rowStart + row; x++) {
+                for (int y = colStart; y < colStart + col; y++) {
+                    functionOnT[x][y] = computedBlocks[{i, j}][x - rowStart][y - colStart];
+                    if (abs(real(functionOnT[x][y])) < 1e-5 && abs(imag(functionOnT[x][y])) < 1e-5) {
                         functionOnT[x][y] = complexNumber(0, 0);
-                    } 
+                    }
                 }
             }
         }
     }
-
-    cout << "\n Function on T\n";
-    printMatrix(functionOnT);
 
     // Resultant function matrix for input matrix
     complexMatrix finalMatrix = Q * functionOnT;
@@ -143,6 +126,7 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
 }
 
 int main() {
+    freopen("inputs/driver[33].txt", "r", stdin);
     // Take Input
     int n;
     cin >> n;

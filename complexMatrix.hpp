@@ -2,10 +2,12 @@
 
 #include <bits/stdc++.h>
 #include <complex>
+
 using namespace std;
 
 #define complexNumber complex<double>
 #define complexMatrix vector<vector<complexNumber>>
+#define delta 1e-10
 #define zeroLimit 1e-5
 
 // + operator overloaded to add two complex matrices
@@ -46,14 +48,14 @@ inline complexMatrix operator*(complexMatrix &A, complexMatrix &B) {
     return res;
 }
 
-inline void processZero(complexMatrix &inputMatrix){
+inline void processZero(complexMatrix &inputMatrix) {
     int row = inputMatrix.size(), col = inputMatrix[0].size();
-    for(int i=0; i<row; i++){
-        for(int j=0; j<col; j++){
-            if(abs(real(inputMatrix[i][j])) <= zeroLimit){
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            if (abs(real(inputMatrix[i][j])) <= zeroLimit) {
                 inputMatrix[i][j] = complexNumber(0, imag(inputMatrix[i][j]));
             }
-            if(abs(imag(inputMatrix[i][j])) <= zeroLimit){
+            if (abs(imag(inputMatrix[i][j])) <= zeroLimit) {
                 inputMatrix[i][j] = complexNumber(real(inputMatrix[i][j]), 0);
             }
         }
@@ -63,7 +65,7 @@ inline void processZero(complexMatrix &inputMatrix){
 // Function to print complex matrix
 inline void printMatrix(complexMatrix &res) {
     int n = res.size();
-    if(n==0) return;
+    if (n == 0) return;
     int m = res[0].size();
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
