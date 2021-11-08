@@ -4,6 +4,7 @@
 // Driver function for testing
 int main() {
     // Take Input
+    freopen("../inputs/patersonStockmeyer.txt", "r", stdin);
     int n;
     cin >> n;
     complexMatrix A(n, vector<complexNumber>(n, {0.0, 0.0}));

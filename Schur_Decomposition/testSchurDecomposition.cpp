@@ -3,6 +3,7 @@
 
 // Driver function for testing
 int main() {
+    freopen("../inputs/schurDecomposition.txt", "r", stdin);
     // Take Input
     int n;
     cin >> n;

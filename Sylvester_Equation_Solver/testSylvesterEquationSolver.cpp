@@ -3,6 +3,7 @@
 
 // Driver function
 int main() {
+    freopen("../inputs/sylvesterEquationSolver.txt", "r", stdin);
     int p;
     cin >> p;
     complexMatrix A(p, vector<complexNumber>(p, complexNumber(0, 0)));
