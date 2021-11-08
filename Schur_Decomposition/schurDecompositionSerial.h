@@ -43,7 +43,7 @@ inline vector<complexMatrix> computeQR(complexMatrix &inputMatrix)
 }
 
 // Function to perform iterations of Schur Decomposition
-inline vector<complexMatrix> schurDecompositionSerial(complexMatrix &inputMatrix, int numberOfIterations)
+inline vector<complexMatrix> schurDecompositionSerial(complexMatrix inputMatrix, int numberOfIterations)
 {
     complexMatrix Q, R;
     complexMatrix QFinal = identityMatrix(inputMatrix.size());
@@ -55,6 +55,8 @@ inline vector<complexMatrix> schurDecompositionSerial(complexMatrix &inputMatrix
         inputMatrix = R * Q;
         QFinal = QFinal * Q;
     }
+    processZero(QFinal);
+    processZero(inputMatrix);
     return {transposeMatrix(QFinal), inputMatrix};
 }
 

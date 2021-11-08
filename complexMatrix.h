@@ -1,10 +1,12 @@
 // Header file for complex matrix operations
 
 #include <bits/stdc++.h>
+#include <complex>
 using namespace std;
 
 #define complexNumber complex<double>
 #define complexMatrix vector<vector<complexNumber>>
+#define zeroLimit 1e-5
 
 // + operator overloaded to add two complex matrices
 inline complexMatrix operator+(complexMatrix &A, complexMatrix &B) {
@@ -42,6 +44,20 @@ inline complexMatrix operator*(complexMatrix &A, complexMatrix &B) {
         }
     }
     return res;
+}
+
+inline void processZero(complexMatrix &inputMatrix){
+    int row = inputMatrix.size(), col = inputMatrix[0].size();
+    for(int i=0; i<row; i++){
+        for(int j=0; j<col; j++){
+            if(abs(real(inputMatrix[i][j])) <= zeroLimit){
+                inputMatrix[i][j] = complexNumber(0, imag(inputMatrix[i][j]));
+            }
+            if(abs(imag(inputMatrix[i][j])) <= zeroLimit){
+                inputMatrix[i][j] = complexNumber(real(inputMatrix[i][j]), 0);
+            }
+        }
+    }
 }
 
 // Function to print complex matrix
@@ -102,6 +118,7 @@ inline complexMatrix computeKroneckerProduct(complexMatrix &A, complexMatrix &B)
             }
         }
     }
+    processZero(res);
     return res;
 }
 
@@ -168,6 +185,7 @@ inline complexMatrix gaussElimination(complexMatrix &A, complexMatrix &B) {
             updateRow(A, B, i, j);
         }
     }
+    processZero(A);
     complexMatrix res(size, vector<complexNumber>(1));
     for (int x = size - 1; x >= 0; x--) {
         complexNumber sum(0, 0);
@@ -176,5 +194,6 @@ inline complexMatrix gaussElimination(complexMatrix &A, complexMatrix &B) {
         }
         res[x][0] = (B[x][0] - sum) / A[x][x];
     }
+    processZero(res);
     return res;
 }

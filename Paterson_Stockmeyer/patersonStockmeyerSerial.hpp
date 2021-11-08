@@ -45,6 +45,7 @@ inline complexMatrix patersonStockmeyerSerial(complexMatrix &inputMatrix, vector
     }
 
     // Return answer
+    processZero(resultantMatrix);
     return resultantMatrix;
 }
 
