@@ -1,17 +1,14 @@
-#include "../complexMatrix.h"
-#include "schurDecompositionSerial.h"
+#include "../complexMatrix.hpp"
+#include "schurDecompositionSerial.hpp"
 
 // Driver function for testing
-int main()
-{
+int main() {
     // Take Input
     int n;
     cin >> n;
     complexMatrix A(n, vector<complexNumber>(n, {0.0, 0.0}));
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             double a, b;
             cin >> a >> b;
             A[i][j] = {a, b};
