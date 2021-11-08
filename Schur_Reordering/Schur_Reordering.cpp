@@ -1,4 +1,4 @@
-#include "../complexMatrix.h"
+#include "../complexMatrix.hpp"
 #define ZERO 1e-10
 
 bool realCmp(pair<complexNumber, int> &a, pair<complexNumber, int> &b) {

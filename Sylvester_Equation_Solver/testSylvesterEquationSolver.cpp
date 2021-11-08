@@ -1,5 +1,5 @@
-#include "../complexMatrix.h"
-#include "sylvesterEquationSolverSerial.h"
+#include "../complexMatrix.hpp"
+#include "sylvesterEquationSolverSerial.hpp"
 
 // Driver function
 int main() {
