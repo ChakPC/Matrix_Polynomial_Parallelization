@@ -7,7 +7,7 @@ using namespace std;
 
 #define complexNumber complex<double>
 #define complexMatrix vector<vector<complexNumber>>
-#define delta 1e-10
+#define clusterThreshold 0.1
 #define zeroLimit 1e-5
 
 // + operator overloaded to add two complex matrices
@@ -151,6 +151,37 @@ inline complexMatrix reverseStacking(complexMatrix &inputMatrix, int rows) {
         }
     }
     return res;
+}
+
+// Comparator to compare complex number
+inline bool cmp(complexNumber &A, complexNumber &B){
+    double a = real(A) * real(A) + imag(A) * imag(A);
+    double b = real(B) * real(B) + imag(B) * imag(B);
+    return a < b;
+}
+
+// Check for clustered Eigen Values
+inline bool checkClusteredEigenValues(complexMatrix &T){
+    int size = T.size();
+    vector<complexNumber> eigenValues;
+    for(int i=0; i<size; i++){
+        if(i+1 < size && abs(real(T[i+1][i])) > zeroLimit){
+            double a = real(T[i][i]), b = real(T[i][i+1]), c = real(T[i+1][i]);
+            eigenValues.push_back(complexNumber(a, sqrt(-b*c)));
+            eigenValues.push_back(complexNumber(a, -sqrt(-b*c)));
+            i++;
+        }
+        else{
+            eigenValues.push_back(T[i][i]);
+        }
+    }
+    sort(eigenValues.begin(), eigenValues.end(), cmp);
+    for(int i=0; i<eigenValues.size()-1; i++){
+        double t1 = real(eigenValues[i+1]) * real(eigenValues[i+1]) + imag(eigenValues[i+1]) * imag(eigenValues[i+1]);
+        double t2 = real(eigenValues[i]) * real(eigenValues[i]) + imag(eigenValues[i]) * imag(eigenValues[i]);
+        if(t1 - t2 <= clusterThreshold) return 1;
+    }
+    return 0;
 }
 
 // Function to update a row for gauss elimination

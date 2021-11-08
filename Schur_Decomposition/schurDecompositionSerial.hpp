@@ -29,8 +29,7 @@ inline vector<complexMatrix> computeQR(complexMatrix &inputMatrix) {
             if(inputMatrix[i][j] == complexNumber(0, 0)) continue;
             complexNumber factor = R[i][j] / R[j][j];
             if(factor == complexNumber(0, 1) || factor == complexNumber(0, -1)){
-                cout << "\n Unable to compute Given's rotation for input matrix...Exiting\n";
-                exit(0);
+                return {};
             }
             auto G = computeGivens(i, j, sizeOfMatrix, R[i][j], R[j][j]);
             QTranspose = G * QTranspose;
@@ -49,6 +48,9 @@ inline vector<complexMatrix> schurDecompositionSerial(complexMatrix inputMatrix,
     complexMatrix QFinal = identityMatrix(inputMatrix.size());
     for (int i = 0; i < numberOfIterations; i++) {
         vector<complexMatrix> QR_Vector = computeQR(inputMatrix);
+        if(QR_Vector.size() == 0){
+            return {};
+        }
         Q = QR_Vector[0];
         R = QR_Vector[1];
         inputMatrix = R * Q;
