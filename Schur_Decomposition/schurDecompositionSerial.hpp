@@ -4,7 +4,7 @@
 // Theta computed as such that after rotation, the value at (i, j) becomes 0
 inline complexMatrix computeGivens(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj) {
     // Compute theta
-    complexNumber theta = atan((complexNumber(-1.0, 0.0) * Aij) / (Ajj + delta));
+    complexNumber theta = atan((complexNumber(-1.0, 0.0) * Aij) / (Ajj));
     complexNumber cosTheta = cos(theta);
     complexNumber sinTheta = sin(theta);
 
@@ -26,6 +26,12 @@ inline vector<complexMatrix> computeQR(complexMatrix &inputMatrix) {
     complexMatrix QTranspose = identityMatrix(sizeOfMatrix);
     for (int i = 1; i < sizeOfMatrix; i++) {
         for (int j = 0; j < i; j++) {
+            if(inputMatrix[i][j] == complexNumber(0, 0)) continue;
+            complexNumber factor = R[i][j] / R[j][j];
+            if(factor == complexNumber(0, 1) || factor == complexNumber(0, -1)){
+                cout << "\n Unable to compute Given's rotation for input matrix...Exiting\n";
+                exit(0);
+            }
             auto G = computeGivens(i, j, sizeOfMatrix, R[i][j], R[j][j]);
             QTranspose = G * QTranspose;
             R = G * R;
