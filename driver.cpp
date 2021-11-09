@@ -58,7 +58,7 @@ tuple<int, map<pair<int, int>, complexMatrix>, map<pair<int, int>, pair<int, int
 complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &coeff, int numOfIterations, int PS_p, int PS_s) {
     // Schur Decomposition
     vector<complexMatrix> schur = schurDecompositionSerial(A, numOfIterations);
-    if(schur.size() == 0){
+    if (schur.size() == 0) {
         // Check compatibility for Given's rotation
         complexMatrix patersonStockmeyerResult = patersonStockmeyerSerial(A, coeff, PS_p, PS_s);
         return patersonStockmeyerResult;
@@ -68,7 +68,7 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
 
     // Check clustering of Eigen values
     bool flag = checkClusteredEigenValues(T);
-    if(flag){
+    if (flag) {
         complexMatrix patersonStockmeyerResult = patersonStockmeyerSerial(A, coeff, PS_p, PS_s);
         return patersonStockmeyerResult;
     }
