@@ -1,8 +1,9 @@
 #include "../complexMatrix.hpp"
 #include "schurDecompositionSerial.hpp"
-
+#include <omp.h>
 // Driver function for testing
 int main() {
+    omp_set_num_threads(4);
     freopen("../inputs/schurDecomposition.txt", "r", stdin);
     // Take Input
     int n;
@@ -12,7 +13,7 @@ int main() {
         for (int j = 0; j < n; j++) {
             double a, b;
             cin >> a >> b;
-            A[i][j] = {a, b};
+            A[i][j] = complexNumber(a, b);
         }
     }
     vector<complexMatrix> t = schurDecompositionSerial(A, 10);

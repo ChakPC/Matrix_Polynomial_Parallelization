@@ -10,6 +10,7 @@ inline complexMatrix computeGivens(int i, int j, int sizeOfMatrix, complexNumber
 
     // Compute Givens matrix
     complexMatrix Givens(sizeOfMatrix, vector<complexNumber>(sizeOfMatrix, complexNumber(0.0, 0.0)));
+#pragma omp parallel for
     for (int x = 0; x < sizeOfMatrix; x++) {
         Givens[x][x] = complexNumber(1.0, 0.0);
     }
@@ -26,9 +27,9 @@ inline vector<complexMatrix> computeQR(complexMatrix &inputMatrix) {
     complexMatrix QTranspose = identityMatrix(sizeOfMatrix);
     for (int i = 1; i < sizeOfMatrix; i++) {
         for (int j = 0; j < i; j++) {
-            if(inputMatrix[i][j] == complexNumber(0, 0)) continue;
+            if (inputMatrix[i][j] == complexNumber(0, 0)) continue;
             complexNumber factor = R[i][j] / R[j][j];
-            if(factor == complexNumber(0, 1) || factor == complexNumber(0, -1)){
+            if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1)) {
                 return {};
             }
             auto G = computeGivens(i, j, sizeOfMatrix, R[i][j], R[j][j]);
@@ -48,7 +49,7 @@ inline vector<complexMatrix> schurDecompositionSerial(complexMatrix inputMatrix,
     complexMatrix QFinal = identityMatrix(inputMatrix.size());
     for (int i = 0; i < numberOfIterations; i++) {
         vector<complexMatrix> QR_Vector = computeQR(inputMatrix);
-        if(QR_Vector.size() == 0){
+        if (QR_Vector.size() == 0) {
             return {};
         }
         Q = QR_Vector[0];
