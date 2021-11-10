@@ -1,5 +1,5 @@
 #include "../complexMatrix.hpp"
-#include "patersonStockmeyerSerial.hpp"
+#include "patersonStockmeyer.hpp"
 
 // Driver function for testing
 int main() {

@@ -10,9 +10,12 @@ inline complexMatrix computeGivens(int i, int j, int sizeOfMatrix, complexNumber
 
     // Compute Givens matrix
     complexMatrix Givens(sizeOfMatrix, vector<complexNumber>(sizeOfMatrix, complexNumber(0.0, 0.0)));
+
+#pragma omp parallel for
     for (int x = 0; x < sizeOfMatrix; x++) {
         Givens[x][x] = complexNumber(1.0, 0.0);
     }
+
     Givens[i][i] = cosTheta;
     Givens[j][j] = cosTheta;
     Givens[i][j] = sinTheta;
