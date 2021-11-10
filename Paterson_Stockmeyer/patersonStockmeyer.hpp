@@ -60,9 +60,12 @@ inline complexMatrix patersonStockmeyerParallel(complexMatrix &inputMatrix, vect
     // Declare resultant matrix
     complexMatrix resultantMatrix(inputMatrixSize, vector<complexNumber>(inputMatrixSize, complexNumber(0.0, 0.0)));
 
-    // Horner's loop
+// Horner's loop
+#pragma omp for
     for (int q = polynomialDegree - 1; q >= 0; q--) {
         complexMatrix temp(inputMatrixSize, vector<complexNumber>(inputMatrixSize, complexNumber(0.0, 0.0)));
+#pragma parallel for reduction(+ \
+                               : temp)
         for (int j = 0; j < polynomialVariable; j++) {
             complexNumber coeff = {0.0, 0.0};
             int index = polynomialVariable * q + j;
