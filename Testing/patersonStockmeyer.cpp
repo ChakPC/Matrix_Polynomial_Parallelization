@@ -58,3 +58,33 @@ TEST_CASE("Paterson Stockmeyer Parallel (complex)", "") {
     complexMatrix patersonStockmeyerParallelOutput3d = patersonStockmeyerParallel(A, coeff, 2, 2);
     REQUIRE(areMatricesEqual(res, patersonStockmeyerParallelOutput3d) == true);
 }
+
+TEST_CASE("Paterson Stockmeyer stress test", "") {
+    system("python3 tests_generator.py");
+    freopen("input.txt", "r", stdin);
+    int n;
+    cin >> n;
+    complexMatrix A(n, vector<complexNumber>(n, {0.0, 0.0}));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            double a, b;
+            cin >> a >> b;
+            A[i][j] = {a, b};
+        }
+    }
+    int d;
+    cin >> d;
+    vector<complexNumber> coeff(d + 1, {0.0, 0.0});
+    for (int i = 0; i <= d; i++) {
+        double a, b;
+        cin >> a >> b;
+        coeff[i] = {a, b};
+    }
+    double start = omp_get_wtime();
+    complexMatrix resSerial = patersonStockmeyerSerial(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    printf("S: %f\n", omp_get_wtime() - start);
+    start = omp_get_wtime();
+    complexMatrix resParallel = patersonStockmeyerParallel(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    printf("P: %f\n", omp_get_wtime() - start);
+    REQUIRE(areMatricesEqual(resSerial, resParallel) == true);
+}
