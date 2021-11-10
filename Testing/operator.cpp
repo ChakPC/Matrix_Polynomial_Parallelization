@@ -2,15 +2,22 @@
 #include "catch.hpp"
 #include "../complexMatrix.hpp"
 
-TEST_CASE("Operator Overloading", "") {
-    complexMatrix A(2, vector<complexNumber>(2, complexNumber(0, 0)));
-    complexMatrix B(2, vector<complexNumber>(2, complexNumber(0, 0)));
+std::string FullPrecision(double d) {
+    auto s = std::ostringstream{};
+    s << std::setprecision(std::numeric_limits<double>::max_digits10) << d;
+    return s.str();
+}
 
-    A = {
+TEST_CASE("Operator Overloading", "") {
+    complexMatrix A = {
         {complexNumber(1, 3), complexNumber(2, 5)},
         {complexNumber(8, 0), complexNumber(10, 7)},
     };
-    B = {
+    complexMatrix A1 = {
+        {complexNumber(1.000001, 3.000000013), complexNumber(2, 5)},
+        {complexNumber(8, 0), complexNumber(10, 7)},
+    };
+    complexMatrix B = {
         {complexNumber(55, 2), complexNumber(12, 2)},
         {complexNumber(1, 3), complexNumber(34, 3)},
     };
@@ -27,6 +34,7 @@ TEST_CASE("Operator Overloading", "") {
         {complexNumber(110, 4), complexNumber(24, 4)},
         {complexNumber(2, 6), complexNumber(68, 6)}};
 
+    REQUIRE(areMatricesEqual(A, A1) == true);
     REQUIRE(sum == A + B);
     REQUIRE(product == A * B);
     REQUIRE(twoB == 2 * B);

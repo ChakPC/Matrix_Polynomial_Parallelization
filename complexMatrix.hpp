@@ -10,6 +10,10 @@ using namespace std;
 #define clusterThreshold 0.1
 #define zeroLimit 1e-5
 
+bool areSame(complexNumber x, complexNumber y) {
+    return (fabs(real(x) - real(y)) < zeroLimit) && (fabs(imag(x) - imag(y)) < zeroLimit);
+}
+
 // + operator overloaded to add two complex matrices
 inline complexMatrix operator+(complexMatrix &A, complexMatrix &B) {
     int row = A.size(), col = A[0].size();
@@ -66,6 +70,22 @@ inline void processZero(complexMatrix &inputMatrix) {
             }
         }
     }
+}
+
+bool areMatricesEqual(complexMatrix &A, complexMatrix &B) {
+    if (A.size() != B.size() || A[0].size() != B[0].size()) return false;
+    volatile bool flag = false;
+#pragma omp parallel for shared(flag) collapse(2)
+    for (int i = 0; i < A.size(); i++) {
+        for (int j = 0; j < A[0].size(); j++) {
+            if (flag) continue;
+            if (!areSame(A[i][j], B[i][j])) {
+                flag = true;
+            }
+        }
+    }
+    if (flag) return false;
+    return true;
 }
 
 // Function to print complex matrix
