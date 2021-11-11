@@ -58,7 +58,7 @@ inline void processZeroParallel(complexMatrix &inputMatrix) {
     }
 }
 
-bool areMatricesEqualParallel(complexMatrix &A, complexMatrix &B) {
+inline bool areMatricesEqualParallel(complexMatrix &A, complexMatrix &B) {
     if (A.size() != B.size() || A[0].size() != B[0].size()) return false;
     volatile bool flag = false;
 #pragma omp parallel for shared(flag) collapse(2)
