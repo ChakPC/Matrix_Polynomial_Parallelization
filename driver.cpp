@@ -1,4 +1,3 @@
-#include <bits/stdc++.h>
 #include "complexMatrix.hpp"
 #include "complexMatrixSerial.hpp"
 #include "complexMatrixParallel.hpp"
@@ -100,16 +99,16 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
             int j = i + diff;
             complexMatrix SES_A = blocks[{i, i}];
             complexMatrix SES_B = blocks[{j, j}];
-            complexMatrix SES_C = computedBlocks[{i, i}] * blocks[{i, j}];
-            complexMatrix temp = blocks[{i, j}] * computedBlocks[{j, j}];
-            temp = complexNumber(-1, 0) * temp;
-            SES_C = SES_C + temp;
+            complexMatrix SES_C = multiplySerial(computedBlocks[{i, i}], blocks[{i, j}]);
+            complexMatrix temp = multiplySerial(blocks[{i, j}], computedBlocks[{j, j}]);
+            temp = multiplySerial(complexNumber(-1, 0), temp);
+            SES_C = addSerial(SES_C, temp);
             for (int k = i + 1; k < j; k++) {
-                complexMatrix term1 = computedBlocks[{i, k}] * blocks[{k, j}];
-                complexMatrix term2 = blocks[{i, k}] * computedBlocks[{k, j}];
-                term2 = complexNumber(-1, 0) * term2;
-                term1 = term1 + term2;
-                SES_C = SES_C + term1;
+                complexMatrix term1 = multiplySerial(computedBlocks[{i, k}], blocks[{k, j}]);
+                complexMatrix term2 = multiplySerial(blocks[{i, k}], computedBlocks[{k, j}]);
+                term2 = multiplySerial(complexNumber(-1, 0), term2);
+                term1 = addSerial(term1, term2);
+                SES_C = addSerial(SES_C, term1);
             }
             complexMatrix SES_X = sylvesterEquationSolverSerial(SES_A, SES_B, SES_C);
             computedBlocks[{i, j}] = SES_X;
@@ -136,9 +135,9 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
     }
 
     // Resultant function matrix for input matrix
-    complexMatrix finalMatrix = Q * functionOnT;
+    complexMatrix finalMatrix = multiplySerial(Q, functionOnT);
     complexMatrix QTranspose = transposeMatrixSerial(Q);
-    finalMatrix = finalMatrix * QTranspose;
+    finalMatrix = multiplySerial(finalMatrix, QTranspose);
 
     return finalMatrix;
 }
