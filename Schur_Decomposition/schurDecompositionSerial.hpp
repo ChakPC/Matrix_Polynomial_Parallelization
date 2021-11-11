@@ -59,7 +59,7 @@ inline vector<complexMatrix> schurDecompositionSerial(complexMatrix inputMatrix,
         inputMatrix = R * Q;
         QFinal = QFinal * Q;
     }
-    processZero(QFinal);
-    processZero(inputMatrix);
+    processZeroSerial(QFinal);
+    processZeroSerial(inputMatrix);
     return {transposeMatrix(QFinal), inputMatrix};
 }

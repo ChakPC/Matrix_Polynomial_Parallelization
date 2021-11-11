@@ -37,15 +37,15 @@ inline complexMatrix patersonStockmeyerSerial(complexMatrix &inputMatrix, vector
             complexNumber coeff = {0.0, 0.0};
             int index = polynomialVariable * q + j;
             if (j <= degree) coeff = coefficients[index];
-            complexMatrix adder = coeff * powersOfInputMatrix[j];
-            temp = temp + adder;
+            complexMatrix adder = serialMultiply(coeff, powersOfInputMatrix[j]);
+            temp = serialAdd(temp, adder);
         }
-        complexMatrix adder = resultantMatrix * powersOfInputMatrix[polynomialVariable];
-        resultantMatrix = adder + temp;
+        complexMatrix adder = serialMultiply(resultantMatrix, powersOfInputMatrix[polynomialVariable]);
+        resultantMatrix = serialAdd(adder, temp);
     }
 
     // Return answer
-    processZero(resultantMatrix);
+    processZeroSerial(resultantMatrix);
     return resultantMatrix;
 }
 
@@ -60,24 +60,28 @@ inline complexMatrix patersonStockmeyerParallel(complexMatrix &inputMatrix, vect
     // Declare resultant matrix
     complexMatrix resultantMatrix(inputMatrixSize, vector<complexNumber>(inputMatrixSize, complexNumber(0.0, 0.0)));
 
-// Horner's loop
-#pragma omp for
+    // Horner's loop
     for (int q = polynomialDegree - 1; q >= 0; q--) {
         complexMatrix temp(inputMatrixSize, vector<complexNumber>(inputMatrixSize, complexNumber(0.0, 0.0)));
-#pragma parallel for reduction(+ \
-                               : temp)
+
+#pragma omp parallel for
         for (int j = 0; j < polynomialVariable; j++) {
             complexNumber coeff = {0.0, 0.0};
             int index = polynomialVariable * q + j;
             if (j <= degree) coeff = coefficients[index];
             complexMatrix adder = coeff * powersOfInputMatrix[j];
-            temp = temp + adder;
+
+#pragma omp critical
+            {
+                temp = temp + adder;
+            }
         }
+
         complexMatrix adder = resultantMatrix * powersOfInputMatrix[polynomialVariable];
         resultantMatrix = adder + temp;
     }
 
     // Return answer
-    processZero(resultantMatrix);
+    processZeroParallel(resultantMatrix);
     return resultantMatrix;
 }

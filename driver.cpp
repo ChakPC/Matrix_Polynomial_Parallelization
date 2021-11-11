@@ -84,7 +84,7 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
     int size = A.size();
     for (int i = 1; i <= numOfBlocks; i++) {
         complexMatrix computedBlock = patersonStockmeyerSerial(blocks[{i, i}], coeff, PS_p, PS_s);
-        processZero(computedBlock);
+        processZeroSerial(computedBlock);
         computedBlocks[{i, i}] = computedBlock;
     }
 

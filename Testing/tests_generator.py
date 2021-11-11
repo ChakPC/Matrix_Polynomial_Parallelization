@@ -2,7 +2,7 @@ import random
 import sys
 
 sys.stdout = open("input.txt", "w")
-SIZE_MATRIX = 500
+SIZE_MATRIX = 400
 COEFF_SIZE = 10
 
 print(SIZE_MATRIX)

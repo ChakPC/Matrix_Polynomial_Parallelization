@@ -27,7 +27,6 @@ inline complexMatrix sylvesterEquationSolver(complexMatrix A, complexMatrix B, c
     complexMatrix b = columnStack(C);
     x = gaussElimination(K, b);
     complexMatrix X = reverseStacking(x, p);
-    processZero(X);
+    processZeroSerial(X);
     return X;
 }
-

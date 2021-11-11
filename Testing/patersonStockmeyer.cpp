@@ -80,10 +80,13 @@ TEST_CASE("Paterson Stockmeyer stress test", "") {
         cin >> a >> b;
         coeff[i] = {a, b};
     }
+    omp_set_num_threads(1);
     double start = omp_get_wtime();
     complexMatrix resSerial = patersonStockmeyerSerial(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
     printf("S: %f\n", omp_get_wtime() - start);
     start = omp_get_wtime();
+
+    omp_set_num_threads(8);
     complexMatrix resParallel = patersonStockmeyerParallel(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
     printf("P: %f\n", omp_get_wtime() - start);
     REQUIRE(areMatricesEqual(resSerial, resParallel) == true);

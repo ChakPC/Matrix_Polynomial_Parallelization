@@ -28,6 +28,17 @@ inline complexMatrix operator+(complexMatrix &A, complexMatrix &B) {
     return res;
 }
 
+complexMatrix serialAdd(complexMatrix &A, complexMatrix &B) {
+    int row = A.size(), col = A[0].size();
+    complexMatrix res(row, vector<complexNumber>(col, complexNumber(0.0, 0.0)));
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            res[i][j] = A[i][j] + B[i][j];
+        }
+    }
+    return res;
+}
+
 // * operator overloaded to multiply a complex number with a complex matrix
 inline complexMatrix operator*(complexNumber coeff, complexMatrix &matrix) {
     int row = matrix.size(), col = matrix[0].size();
@@ -37,6 +48,30 @@ inline complexMatrix operator*(complexNumber coeff, complexMatrix &matrix) {
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
             res[i][j] = coeff * matrix[i][j];
+        }
+    }
+    return res;
+}
+
+complexMatrix serialMultiply(complexNumber coeff, complexMatrix &matrix) {
+    int row = matrix.size(), col = matrix[0].size();
+    complexMatrix res(row, vector<complexNumber>(col, {0.0, 0.0}));
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            res[i][j] = coeff * matrix[i][j];
+        }
+    }
+    return res;
+}
+
+complexMatrix serialMultiply(complexMatrix &A, complexMatrix &B) {
+    int rowA = A.size(), colA = A[0].size(), rowB = B.size(), colB = B[0].size();
+    complexMatrix res(rowA, vector<complexNumber>(colB, {0.0, 0.0}));
+    for (int i = 0; i < rowA; i++) {
+        for (int j = 0; j < colB; j++) {
+            for (int k = 0; k < colA; k++) {
+                res[i][j] = res[i][j] + A[i][k] * B[k][j];
+            }
         }
     }
     return res;
@@ -58,8 +93,24 @@ inline complexMatrix operator*(complexMatrix &A, complexMatrix &B) {
     return res;
 }
 
-inline void processZero(complexMatrix &inputMatrix) {
+inline void processZeroSerial(complexMatrix &inputMatrix) {
     int row = inputMatrix.size(), col = inputMatrix[0].size();
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            if (abs(real(inputMatrix[i][j])) <= zeroLimit) {
+                inputMatrix[i][j] = complexNumber(0, imag(inputMatrix[i][j]));
+            }
+            if (abs(imag(inputMatrix[i][j])) <= zeroLimit) {
+                inputMatrix[i][j] = complexNumber(real(inputMatrix[i][j]), 0);
+            }
+        }
+    }
+}
+
+inline void processZeroParallel(complexMatrix &inputMatrix) {
+    int row = inputMatrix.size(), col = inputMatrix[0].size();
+
+#pragma omp parallel for collapse(2)
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
             if (abs(real(inputMatrix[i][j])) <= zeroLimit) {
@@ -146,7 +197,7 @@ inline complexMatrix computeKroneckerProduct(complexMatrix &A, complexMatrix &B)
             }
         }
     }
-    processZero(res);
+    processZeroSerial(res);
     return res;
 }
 
@@ -243,7 +294,7 @@ inline complexMatrix gaussElimination(complexMatrix &A, complexMatrix &B) {
             updateRow(A, B, i, j);
         }
     }
-    processZero(A);
+    processZeroSerial(A);
     complexMatrix res(size, vector<complexNumber>(1));
     for (int x = size - 1; x >= 0; x--) {
         complexNumber sum(0, 0);
@@ -252,6 +303,6 @@ inline complexMatrix gaussElimination(complexMatrix &A, complexMatrix &B) {
         }
         res[x][0] = (B[x][0] - sum) / A[x][x];
     }
-    processZero(res);
+    processZeroSerial(res);
     return res;
 }
