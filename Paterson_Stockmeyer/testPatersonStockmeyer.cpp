@@ -1,4 +1,6 @@
 #include "../complexMatrix.hpp"
+#include "../complexMatrixSerial.hpp"
+#include "../complexMatrixParallel.hpp"
 #include "patersonStockmeyerSerial.hpp"
 #include "patersonStockmeyerParallel.hpp"
 
@@ -24,9 +26,17 @@ int main() {
         cin >> a >> b;
         coeff[i] = {a, b};
     }
-    complexMatrix res1 = serialPatersonStockmeyer(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    complexMatrix res1 = patersonStockmeyerSerial(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    auto t2 = std::chrono::high_resolution_clock::now();
     printMatrix(res1);
-    complexMatrix res2 = parallelPatersonStockmeyer(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    auto t3 = std::chrono::high_resolution_clock::now();
+    complexMatrix res2 = patersonStockmeyerParallel(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    auto t4 = std::chrono::high_resolution_clock::now();
     printMatrix(res2);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+    cout << "Serial Time: " << duration.count() << endl;
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3);
+    cout << "Parallel Time: " << duration.count() << endl;
     return 0;
 }

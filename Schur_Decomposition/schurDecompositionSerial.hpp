@@ -2,7 +2,7 @@
 
 // Function to compute Givens matrix for given i, j
 // Theta computed as such that after rotation, the value at (i, j) becomes 0
-inline complexMatrix serialComputeGivens(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj) {
+inline complexMatrix computeGivensSerial(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj) {
     // Compute theta
     complexNumber theta = atan((complexNumber(-1.0, 0.0) * Aij) / (Ajj));
     complexNumber cosTheta = cos(theta);
@@ -11,7 +11,6 @@ inline complexMatrix serialComputeGivens(int i, int j, int sizeOfMatrix, complex
     // Compute Givens matrix
     complexMatrix Givens(sizeOfMatrix, vector<complexNumber>(sizeOfMatrix, complexNumber(0.0, 0.0)));
 
-#pragma omp parallel for
     for (int x = 0; x < sizeOfMatrix; x++) {
         Givens[x][x] = complexNumber(1.0, 0.0);
     }
@@ -23,10 +22,10 @@ inline complexMatrix serialComputeGivens(int i, int j, int sizeOfMatrix, complex
     return Givens;
 }
 
-inline vector<complexMatrix> serialComputeQR(complexMatrix &inputMatrix) {
+inline vector<complexMatrix> computeQRSerial(complexMatrix &inputMatrix) {
     int sizeOfMatrix = inputMatrix.size();
     complexMatrix R = inputMatrix;
-    complexMatrix QTranspose = identityMatrix(sizeOfMatrix);
+    complexMatrix QTranspose = identityMatrixSerial(sizeOfMatrix);
     for (int i = 1; i < sizeOfMatrix; i++) {
         for (int j = 0; j < i; j++) {
             if (inputMatrix[i][j] == complexNumber(0, 0)) continue;
@@ -34,32 +33,32 @@ inline vector<complexMatrix> serialComputeQR(complexMatrix &inputMatrix) {
             if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1)) {
                 return {};
             }
-            auto G = serialComputeGivens(i, j, sizeOfMatrix, R[i][j], R[j][j]);
-            QTranspose = G * QTranspose;
-            R = G * R;
+            auto G = computeGivensSerial(i, j, sizeOfMatrix, R[i][j], R[j][j]);
+            QTranspose = multiplySerial(G, QTranspose);
+            R = multiplySerial(G, R);
         }
     }
 
     // Compute Q and R
-    complexMatrix Q = transposeMatrix(QTranspose);
+    complexMatrix Q = transposeMatrixSerial(QTranspose);
     return {Q, R};
 }
 
 // Function to perform iterations of Schur Decomposition
-inline vector<complexMatrix> serialSchurDecomposition(complexMatrix inputMatrix, int numberOfIterations) {
+inline vector<complexMatrix> schurDecompositionSerial(complexMatrix inputMatrix, int numberOfIterations) {
     complexMatrix Q, R;
-    complexMatrix QFinal = identityMatrix(inputMatrix.size());
+    complexMatrix QFinal = identityMatrixSerial(inputMatrix.size());
     for (int i = 0; i < numberOfIterations; i++) {
-        vector<complexMatrix> QR_Vector = serialComputeQR(inputMatrix);
+        vector<complexMatrix> QR_Vector = computeQRSerial(inputMatrix);
         if (QR_Vector.size() == 0) {
             return {};
         }
         Q = QR_Vector[0];
         R = QR_Vector[1];
-        inputMatrix = R * Q;
-        QFinal = QFinal * Q;
+        inputMatrix = multiplySerial(R, Q);
+        QFinal = multiplySerial(QFinal, Q);
     }
     processZeroSerial(QFinal);
     processZeroSerial(inputMatrix);
-    return {transposeMatrix(QFinal), inputMatrix};
+    return {transposeMatrixSerial(QFinal), inputMatrix};
 }

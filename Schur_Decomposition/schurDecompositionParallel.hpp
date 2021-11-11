@@ -2,7 +2,7 @@
 
 // Function to compute Givens matrix for given i, j
 // Theta computed as such that after rotation, the value at (i, j) becomes 0
-inline complexMatrix parallelComputeGivens(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj) {
+inline complexMatrix computeGivensParallel(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj) {
     // Compute theta
     complexNumber theta = atan((complexNumber(-1.0, 0.0) * Aij) / (Ajj));
     complexNumber cosTheta = cos(theta);
@@ -23,10 +23,24 @@ inline complexMatrix parallelComputeGivens(int i, int j, int sizeOfMatrix, compl
     return Givens;
 }
 
-inline vector<complexMatrix> parallelComputeQR(complexMatrix &inputMatrix) {
+// Function for efficient multiplication with Given's matrix
+inline complexMatrix multG(complexMatrix &G, complexMatrix &operand, int r, int c){
+    complexMatrix res = operand;
+    complexNumber sumR = complexNumber(0, 0);
+    complexNumber sumC = complexNumber(0, 0);
+    int cols = operand[0].size();
+    #pragma omp parallel for
+    for(int i=0; i<cols; i++){
+        res[r][i] = G[r][c] * operand[c][i] + G[r][r] * operand[r][i];
+        res[c][i] = G[c][c] * operand[c][i] + G[c][r] * operand[r][i];
+    }
+    return res;
+}
+
+inline vector<complexMatrix> computeQRParallel(complexMatrix &inputMatrix) {
     int sizeOfMatrix = inputMatrix.size();
     complexMatrix R = inputMatrix;
-    complexMatrix QTranspose = identityMatrix(sizeOfMatrix);
+    complexMatrix QTranspose = identityMatrixParallel(sizeOfMatrix);
     for (int i = 1; i < sizeOfMatrix; i++) {
         for (int j = 0; j < i; j++) {
             if (inputMatrix[i][j] == complexNumber(0, 0)) continue;
@@ -34,23 +48,23 @@ inline vector<complexMatrix> parallelComputeQR(complexMatrix &inputMatrix) {
             if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1)) {
                 return {};
             }
-            auto G = parallelComputeGivens(i, j, sizeOfMatrix, R[i][j], R[j][j]);
-            QTranspose = G * QTranspose;
-            R = G * R;
+            auto G = computeGivensParallel(i, j, sizeOfMatrix, R[i][j], R[j][j]);
+            QTranspose = multG(G, QTranspose, i, j);
+            R = multG(G, R, i, j);
         }
     }
 
     // Compute Q and R
-    complexMatrix Q = transposeMatrix(QTranspose);
+    complexMatrix Q = transposeMatrixParallel(QTranspose);
     return {Q, R};
 }
 
 // Function to perform iterations of Schur Decomposition
-inline vector<complexMatrix> parallelschurDecomposition(complexMatrix inputMatrix, int numberOfIterations) {
+inline vector<complexMatrix> schurDecompositionParallel(complexMatrix inputMatrix, int numberOfIterations) {
     complexMatrix Q, R;
-    complexMatrix QFinal = identityMatrix(inputMatrix.size());
+    complexMatrix QFinal = identityMatrixParallel(inputMatrix.size());
     for (int i = 0; i < numberOfIterations; i++) {
-        vector<complexMatrix> QR_Vector = parallelComputeQR(inputMatrix);
+        vector<complexMatrix> QR_Vector = computeQRParallel(inputMatrix);
         if (QR_Vector.size() == 0) {
             return {};
         }
@@ -59,7 +73,7 @@ inline vector<complexMatrix> parallelschurDecomposition(complexMatrix inputMatri
         inputMatrix = R * Q;
         QFinal = QFinal * Q;
     }
-    processZeroSerial(QFinal);
-    processZeroSerial(inputMatrix);
-    return {transposeMatrix(QFinal), inputMatrix};
+    processZeroParallel(QFinal);
+    processZeroParallel(inputMatrix);
+    return {transposeMatrixParallel(QFinal), inputMatrix};
 }

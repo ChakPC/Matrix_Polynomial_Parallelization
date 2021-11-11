@@ -2,15 +2,15 @@
 
 // Function to compute K = Iq * A - B.T * Ip
 // * denotes kronecker product
-inline complexMatrix parallelComputeK(complexMatrix &A, complexMatrix &B) {
+inline complexMatrix computeKParallel(complexMatrix &A, complexMatrix &B) {
     int p = A.size();
     int q = B.size();
-    complexMatrix Iq = identityMatrix(q);
-    complexMatrix Ip = identityMatrix(p);
-    complexMatrix t1 = computeKroneckerProduct(Iq, A);
-    complexMatrix BTranspose = transposeMatrix(B);
+    complexMatrix Iq = identityMatrixParallel(q);
+    complexMatrix Ip = identityMatrixParallel(p);
+    complexMatrix t1 = computeKroneckerProductParallel(Iq, A);
+    complexMatrix BTranspose = transposeMatrixParallel(B);
     BTranspose = complexNumber(-1, 0) * BTranspose;
-    complexMatrix t2 = computeKroneckerProduct(BTranspose, Ip);
+    complexMatrix t2 = computeKroneckerProductParallel(BTranspose, Ip);
     complexMatrix res = t1 + t2;
     return res;
 }
@@ -20,13 +20,13 @@ inline complexMatrix parallelComputeK(complexMatrix &A, complexMatrix &B) {
 // B: square matrix (q x q)
 // X: (p x q) matrix
 // C: (p x q) matrix
-inline complexMatrix parallelSylvesterEquationSolver(complexMatrix A, complexMatrix B, complexMatrix C) {
+inline complexMatrix sylvesterEquationSolverParallel(complexMatrix A, complexMatrix B, complexMatrix C) {
     int p = A.size(), q = B.size();
     complexMatrix x(p * q, vector<complexNumber>(1, complexNumber(0, 0)));
-    complexMatrix K = parallelComputeK(A, B);
-    complexMatrix b = columnStack(C);
-    x = gaussElimination(K, b);
-    complexMatrix X = reverseStacking(x, p);
-    processZeroSerial(X);
+    complexMatrix K = computeKParallel(A, B);
+    complexMatrix b = columnStackParallel(C);
+    x = gaussEliminationParallel(K, b);
+    complexMatrix X = reverseStackingParallel(x, p);
+    processZeroParallel(X);
     return X;
 }

@@ -1,4 +1,6 @@
 #include "../complexMatrix.hpp"
+#include "../complexMatrixSerial.hpp"
+#include "../complexMatrixParallel.hpp"
 #include "sylvesterEquationSolverSerial.hpp"
 #include "sylvesterEquationSolverParallel.hpp"
 
@@ -33,9 +35,9 @@ int main() {
             C[i][j] = complexNumber(a, b);
         }
     }
-    complexMatrix X1 = serialSylvesterEquationSolver(A, B, C);
+    complexMatrix X1 = sylvesterEquationSolverSerial(A, B, C);
     printMatrix(X1);
-    complexMatrix X2 = parallelSylvesterEquationSolver(A, B, C);
+    complexMatrix X2 = sylvesterEquationSolverParallel(A, B, C);
     printMatrix(X2);
     return 0;
 }

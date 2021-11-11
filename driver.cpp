@@ -1,7 +1,12 @@
 #include "complexMatrix.hpp"
-#include "Paterson_Stockmeyer/patersonStockmeyer.hpp"
+#include "complexMatrixSerial.hpp"
+#include "complexMatrixParallel.hpp"
+#include "Paterson_Stockmeyer/patersonStockmeyerSerial.hpp"
+#include "Paterson_Stockmeyer/patersonStockmeyerParallel.hpp"
 #include "Schur_Decomposition/schurDecompositionSerial.hpp"
+#include "Schur_Decomposition/schurDecompositionParallel.hpp"
 #include "Sylvester_Equation_Solver/sylvesterEquationSolverSerial.hpp"
+#include "Sylvester_Equation_Solver/sylvesterEquationSolverParallel.hpp"
 
 // Function to construct blocks in quasi upper triangular matrix based on diagonal values
 tuple<int, map<pair<int, int>, complexMatrix>, map<pair<int, int>, pair<int, int>>> constructBlocks(complexMatrix &inputMatrix) {
@@ -67,7 +72,7 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
     complexMatrix T = schur[1];
 
     // Check clustering of Eigen values
-    bool flag = checkClusteredEigenValues(T);
+    bool flag = checkClusteredEigenValuesSerial(T);
     if (flag) {
         complexMatrix patersonStockmeyerResult = patersonStockmeyerSerial(A, coeff, PS_p, PS_s);
         return patersonStockmeyerResult;
@@ -105,7 +110,7 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
                 term1 = term1 + term2;
                 SES_C = SES_C + term1;
             }
-            complexMatrix SES_X = sylvesterEquationSolver(SES_A, SES_B, SES_C);
+            complexMatrix SES_X = sylvesterEquationSolverSerial(SES_A, SES_B, SES_C);
             computedBlocks[{i, j}] = SES_X;
         }
     }
@@ -131,7 +136,7 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
 
     // Resultant function matrix for input matrix
     complexMatrix finalMatrix = Q * functionOnT;
-    complexMatrix QTranspose = transposeMatrix(Q);
+    complexMatrix QTranspose = transposeMatrixSerial(Q);
     finalMatrix = finalMatrix * QTranspose;
 
     return finalMatrix;

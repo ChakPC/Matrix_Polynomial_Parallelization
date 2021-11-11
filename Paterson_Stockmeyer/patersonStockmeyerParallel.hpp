@@ -2,30 +2,56 @@
 
 // Function to compute powers of input matrix till exponent limit
 // Brute Force Implmentation: O(limit * n * n)
-inline vector<complexMatrix> parallelComputePowers(complexMatrix &inputMatrix, int limit) {
+inline vector<complexMatrix> computePowersParallel(complexMatrix &inputMatrix, int limit) {
     int sz = inputMatrix.size();
     vector<complexMatrix> res(limit + 1, complexMatrix(sz, vector<complexNumber>(sz, complexNumber(0.0, 0.0))));
     complexMatrix temp = inputMatrix;
-    complexMatrix identity(sz, vector<complexNumber>(sz, complexNumber(0.0, 0.0)));
-    for (int i = 0; i < sz; i++) {
-        identity[i][i] = complexNumber(1.0, 0.0);
-    }
+    complexMatrix identity = identityMatrixParallel(sz);
+    map<int, int> vis;
     res[0] = identity;
+    vis[0] = 1;
     res[1] = inputMatrix;
-    for (int i = 2; i <= limit; i++) {
-        temp = temp * inputMatrix;
-        res[i] = temp;
+    vis[1] = 1;
+    int logLimit = floor(log2(limit));
+    int power = 2;
+    for(int i=1; i<=logLimit; i++){
+        temp = temp * temp;
+        res[1 << i] = temp;
+        vis[1 << i] = 1;
     }
+    #pragma omp parallel for
+    for(int i=2; i<=limit; i+=2){
+        if(!vis[i]){
+            vector<int> decomposition;
+            int val = i;
+            while(val > 0){
+                int greatestPower = floor(log2(val));
+                decomposition.push_back(greatestPower);
+                val -= 1 << greatestPower;
+            }
+            complexMatrix matrix = identity;
+            for(int j=0; j<decomposition.size(); j++){
+                matrix = matrix * res[1 << decomposition[j]];
+            }
+            res[i] = matrix;
+            vis[i] = 1;
+            if(i+1 <= limit){
+                res[i+1] = matrix * inputMatrix;
+                vis[i+1] = 1;
+            }
+        }
+    }
+
     return res;
 }
 
 // Parallel Implementation of Paterson Stockmeyer
-inline complexMatrix parallelPatersonStockmeyer(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree) {
+inline complexMatrix patersonStockmeyerParallel(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree) {
     int inputMatrixSize = inputMatrix.size();
     int degree = coefficients.size() - 1;
 
     // Compute powers of A till p
-    vector<complexMatrix> powersOfInputMatrix = parallelComputePowers(inputMatrix, polynomialVariable);
+    vector<complexMatrix> powersOfInputMatrix = computePowersParallel(inputMatrix, polynomialVariable);
 
     // Declare resultant matrix
     complexMatrix resultantMatrix(inputMatrixSize, vector<complexNumber>(inputMatrixSize, complexNumber(0.0, 0.0)));
