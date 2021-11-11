@@ -1,5 +1,6 @@
 #include "../complexMatrix.hpp"
 #include "sylvesterEquationSolverSerial.hpp"
+#include "sylvesterEquationSolverParallel.hpp"
 
 // Driver function
 int main() {
@@ -32,7 +33,9 @@ int main() {
             C[i][j] = complexNumber(a, b);
         }
     }
-    complexMatrix X = sylvesterEquationSolver(A, B, C);
-    printMatrix(X);
+    complexMatrix X1 = serialSylvesterEquationSolver(A, B, C);
+    printMatrix(X1);
+    complexMatrix X2 = parallelSylvesterEquationSolver(A, B, C);
+    printMatrix(X2);
     return 0;
 }

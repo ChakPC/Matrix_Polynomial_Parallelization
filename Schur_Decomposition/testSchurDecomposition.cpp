@@ -1,5 +1,6 @@
 #include "../complexMatrix.hpp"
 #include "schurDecompositionSerial.hpp"
+#include "schurDecompositionParallel.hpp"
 #include <omp.h>
 // Driver function for testing
 int main() {
@@ -16,10 +17,15 @@ int main() {
             A[i][j] = complexNumber(a, b);
         }
     }
-    vector<complexMatrix> t = schurDecompositionSerial(A, 10);
+    vector<complexMatrix> t1 = serialSchurDecomposition(A, 10);
     printf("\n Q: \n");
-    printMatrix(t[0]);
+    printMatrix(t1[0]);
     printf("\n Ak: \n");
-    printMatrix(t[1]);
+    printMatrix(t1[1]);
+    vector<complexMatrix> t2 = parallelschurDecomposition(A, 10);
+    printf("\n Q: \n");
+    printMatrix(t2[0]);
+    printf("\n Ak: \n");
+    printMatrix(t2[1]);
     return 0;
 }

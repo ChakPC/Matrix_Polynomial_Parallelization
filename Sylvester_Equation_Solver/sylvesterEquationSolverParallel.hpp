@@ -2,7 +2,7 @@
 
 // Function to compute K = Iq * A - B.T * Ip
 // * denotes kronecker product
-inline complexMatrix serialComputeK(complexMatrix &A, complexMatrix &B) {
+inline complexMatrix parallelComputeK(complexMatrix &A, complexMatrix &B) {
     int p = A.size();
     int q = B.size();
     complexMatrix Iq = identityMatrix(q);
@@ -20,10 +20,10 @@ inline complexMatrix serialComputeK(complexMatrix &A, complexMatrix &B) {
 // B: square matrix (q x q)
 // X: (p x q) matrix
 // C: (p x q) matrix
-inline complexMatrix serialSylvesterEquationSolver(complexMatrix A, complexMatrix B, complexMatrix C) {
+inline complexMatrix parallelSylvesterEquationSolver(complexMatrix A, complexMatrix B, complexMatrix C) {
     int p = A.size(), q = B.size();
     complexMatrix x(p * q, vector<complexNumber>(1, complexNumber(0, 0)));
-    complexMatrix K = serialComputeK(A, B);
+    complexMatrix K = parallelComputeK(A, B);
     complexMatrix b = columnStack(C);
     x = gaussElimination(K, b);
     complexMatrix X = reverseStacking(x, p);

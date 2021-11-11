@@ -1,5 +1,6 @@
 #include "../complexMatrix.hpp"
-#include "patersonStockmeyer.hpp"
+#include "patersonStockmeyerSerial.hpp"
+#include "patersonStockmeyerParallel.hpp"
 
 // Driver function for testing
 int main() {
@@ -23,7 +24,9 @@ int main() {
         cin >> a >> b;
         coeff[i] = {a, b};
     }
-    complexMatrix res = patersonStockmeyerSerial(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
-    printMatrix(res);
+    complexMatrix res1 = serialPatersonStockmeyer(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    printMatrix(res1);
+    complexMatrix res2 = parallelPatersonStockmeyer(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    printMatrix(res2);
     return 0;
 }
