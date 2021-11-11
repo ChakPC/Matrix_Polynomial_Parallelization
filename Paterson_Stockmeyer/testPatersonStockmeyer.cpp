@@ -24,9 +24,9 @@ int main() {
         cin >> a >> b;
         coeff[i] = {a, b};
     }
-    complexMatrix res1 = serialPatersonStockmeyer(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    complexMatrix res1 = patersonStockmeyerSerial(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
     printMatrix(res1);
-    complexMatrix res2 = parallelPatersonStockmeyer(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    complexMatrix res2 = patersonStockmeyerParallel(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
     printMatrix(res2);
     return 0;
 }

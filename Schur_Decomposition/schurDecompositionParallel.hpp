@@ -2,7 +2,7 @@
 
 // Function to compute Givens matrix for given i, j
 // Theta computed as such that after rotation, the value at (i, j) becomes 0
-inline complexMatrix parallelComputeGivens(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj) {
+inline complexMatrix computeGivensParallel(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj) {
     // Compute theta
     complexNumber theta = atan((complexNumber(-1.0, 0.0) * Aij) / (Ajj));
     complexNumber cosTheta = cos(theta);
@@ -23,7 +23,7 @@ inline complexMatrix parallelComputeGivens(int i, int j, int sizeOfMatrix, compl
     return Givens;
 }
 
-inline vector<complexMatrix> parallelComputeQR(complexMatrix &inputMatrix) {
+inline vector<complexMatrix> computeQRParallel(complexMatrix &inputMatrix) {
     int sizeOfMatrix = inputMatrix.size();
     complexMatrix R = inputMatrix;
     complexMatrix QTranspose = identityMatrix(sizeOfMatrix);
@@ -34,7 +34,7 @@ inline vector<complexMatrix> parallelComputeQR(complexMatrix &inputMatrix) {
             if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1)) {
                 return {};
             }
-            auto G = parallelComputeGivens(i, j, sizeOfMatrix, R[i][j], R[j][j]);
+            auto G = computeGivensParallel(i, j, sizeOfMatrix, R[i][j], R[j][j]);
             QTranspose = G * QTranspose;
             R = G * R;
         }
@@ -46,11 +46,11 @@ inline vector<complexMatrix> parallelComputeQR(complexMatrix &inputMatrix) {
 }
 
 // Function to perform iterations of Schur Decomposition
-inline vector<complexMatrix> parallelschurDecomposition(complexMatrix inputMatrix, int numberOfIterations) {
+inline vector<complexMatrix> schurDecompositionParallel(complexMatrix inputMatrix, int numberOfIterations) {
     complexMatrix Q, R;
     complexMatrix QFinal = identityMatrix(inputMatrix.size());
     for (int i = 0; i < numberOfIterations; i++) {
-        vector<complexMatrix> QR_Vector = parallelComputeQR(inputMatrix);
+        vector<complexMatrix> QR_Vector = computeQRParallel(inputMatrix);
         if (QR_Vector.size() == 0) {
             return {};
         }

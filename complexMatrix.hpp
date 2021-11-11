@@ -28,7 +28,7 @@ inline complexMatrix operator+(complexMatrix &A, complexMatrix &B) {
     return res;
 }
 
-complexMatrix serialAdd(complexMatrix &A, complexMatrix &B) {
+complexMatrix addSerial(complexMatrix &A, complexMatrix &B) {
     int row = A.size(), col = A[0].size();
     complexMatrix res(row, vector<complexNumber>(col, complexNumber(0.0, 0.0)));
     for (int i = 0; i < row; i++) {
@@ -53,7 +53,7 @@ inline complexMatrix operator*(complexNumber coeff, complexMatrix &matrix) {
     return res;
 }
 
-complexMatrix serialMultiply(complexNumber coeff, complexMatrix &matrix) {
+complexMatrix multiplySerial(complexNumber coeff, complexMatrix &matrix) {
     int row = matrix.size(), col = matrix[0].size();
     complexMatrix res(row, vector<complexNumber>(col, {0.0, 0.0}));
     for (int i = 0; i < row; i++) {
@@ -64,7 +64,7 @@ complexMatrix serialMultiply(complexNumber coeff, complexMatrix &matrix) {
     return res;
 }
 
-complexMatrix serialMultiply(complexMatrix &A, complexMatrix &B) {
+complexMatrix multiplySerial(complexMatrix &A, complexMatrix &B) {
     int rowA = A.size(), colA = A[0].size(), rowB = B.size(), colB = B[0].size();
     complexMatrix res(rowA, vector<complexNumber>(colB, {0.0, 0.0}));
     for (int i = 0; i < rowA; i++) {

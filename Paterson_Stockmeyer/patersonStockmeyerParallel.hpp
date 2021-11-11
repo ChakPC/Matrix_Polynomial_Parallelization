@@ -2,7 +2,7 @@
 
 // Function to compute powers of input matrix till exponent limit
 // Brute Force Implmentation: O(limit * n * n)
-inline vector<complexMatrix> parallelComputePowers(complexMatrix &inputMatrix, int limit) {
+inline vector<complexMatrix> computePowersParallel(complexMatrix &inputMatrix, int limit) {
     int sz = inputMatrix.size();
     vector<complexMatrix> res(limit + 1, complexMatrix(sz, vector<complexNumber>(sz, complexNumber(0.0, 0.0))));
     complexMatrix temp = inputMatrix;
@@ -20,12 +20,12 @@ inline vector<complexMatrix> parallelComputePowers(complexMatrix &inputMatrix, i
 }
 
 // Parallel Implementation of Paterson Stockmeyer
-inline complexMatrix parallelPatersonStockmeyer(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree) {
+inline complexMatrix patersonStockmeyerParallel(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree) {
     int inputMatrixSize = inputMatrix.size();
     int degree = coefficients.size() - 1;
 
     // Compute powers of A till p
-    vector<complexMatrix> powersOfInputMatrix = parallelComputePowers(inputMatrix, polynomialVariable);
+    vector<complexMatrix> powersOfInputMatrix = computePowersParallel(inputMatrix, polynomialVariable);
 
     // Declare resultant matrix
     complexMatrix resultantMatrix(inputMatrixSize, vector<complexNumber>(inputMatrixSize, complexNumber(0.0, 0.0)));

@@ -2,7 +2,7 @@
 
 // Function to compute powers of input matrix till exponent limit
 // Brute Force Implmentation: O(limit * n * n)
-inline vector<complexMatrix> serialComputePowers(complexMatrix &inputMatrix, int limit) {
+inline vector<complexMatrix> computePowersSerial(complexMatrix &inputMatrix, int limit) {
     int sz = inputMatrix.size();
     vector<complexMatrix> res(limit + 1, complexMatrix(sz, vector<complexNumber>(sz, complexNumber(0.0, 0.0))));
     complexMatrix temp = inputMatrix;
@@ -20,12 +20,12 @@ inline vector<complexMatrix> serialComputePowers(complexMatrix &inputMatrix, int
 }
 
 // Serial Implementation of Paterson Stockmeyer
-inline complexMatrix serialPatersonStockmeyer(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree) {
+inline complexMatrix patersonStockmeyerSerial(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree) {
     int inputMatrixSize = inputMatrix.size();
     int degree = coefficients.size() - 1;
 
     // Compute powers of A till p
-    vector<complexMatrix> powersOfInputMatrix = serialComputePowers(inputMatrix, polynomialVariable);
+    vector<complexMatrix> powersOfInputMatrix = computePowersSerial(inputMatrix, polynomialVariable);
 
     // Declare resultant matrix
     complexMatrix resultantMatrix(inputMatrixSize, vector<complexNumber>(inputMatrixSize, complexNumber(0.0, 0.0)));
@@ -37,11 +37,11 @@ inline complexMatrix serialPatersonStockmeyer(complexMatrix &inputMatrix, vector
             complexNumber coeff = {0.0, 0.0};
             int index = polynomialVariable * q + j;
             if (j <= degree) coeff = coefficients[index];
-            complexMatrix adder = serialMultiply(coeff, powersOfInputMatrix[j]);
-            temp = serialAdd(temp, adder);
+            complexMatrix adder = multiplySerial(coeff, powersOfInputMatrix[j]);
+            temp = addSerial(temp, adder);
         }
-        complexMatrix adder = serialMultiply(resultantMatrix, powersOfInputMatrix[polynomialVariable]);
-        resultantMatrix = serialAdd(adder, temp);
+        complexMatrix adder = multiplySerial(resultantMatrix, powersOfInputMatrix[polynomialVariable]);
+        resultantMatrix = addSerial(adder, temp);
     }
 
     // Return answer
