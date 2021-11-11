@@ -1,10 +1,5 @@
-// Header file for complex matrix operations
-
 #include <bits/stdc++.h>
-#include <omp.h>
-
 using namespace std;
-
 #define complexNumber complex<double>
 #define complexMatrix vector<vector<complexNumber>>
 #define clusterThreshold 0.1

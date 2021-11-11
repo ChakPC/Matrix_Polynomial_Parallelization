@@ -1,5 +1,5 @@
+#include <bits/stdc++.h>
 #include "complexMatrix.hpp"
-#include "Paterson_Stockmeyer/patersonStockmeyer.hpp"
 #include "Schur_Decomposition/schurDecompositionSerial.hpp"
 #include "Sylvester_Equation_Solver/sylvesterEquationSolverSerial.hpp"
 
