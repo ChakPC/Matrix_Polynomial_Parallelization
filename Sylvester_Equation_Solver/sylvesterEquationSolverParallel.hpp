@@ -1,5 +1,5 @@
 /*
- * Function to compute K =
+ * Function to compute K
  * denotes kronecker product
  * @param A Matrix A
  * @param B Matrix B

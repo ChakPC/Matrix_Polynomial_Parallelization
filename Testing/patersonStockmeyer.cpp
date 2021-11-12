@@ -1,7 +1,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "../complexMatrix.hpp"
-#include "../Paterson_Stockmeyer/patersonStockmeyer.hpp"
+#include "../Paterson_Stockmeyer/patersonStockmeyerParallel.hpp"
+#include "../Paterson_Stockmeyer/patersonStockmeyerSerial.hpp"
 
 TEST_CASE("Paterson Stockmeyer Serial", "") {
     complexMatrix A = {
