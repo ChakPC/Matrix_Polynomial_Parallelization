@@ -1,3 +1,4 @@
+#include "../complexMatrixParallel.hpp"
 /*
  * Function to compute Givens matrix for given i, j
  * Theta computed as such that after rotation, the value at (i, j) becomes 0
