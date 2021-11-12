@@ -19,8 +19,8 @@ for i in range(SIZE_MATRIX):
     print()
 
 # print(SIZE_MATRIX)
-for i in range(SIZE_MATRIX * SIZE_MATRIX):
-    for j in range(SIZE_MATRIX * SIZE_MATRIX):
+for i in range(SIZE_MATRIX):
+    for j in range(SIZE_MATRIX):
         for _ in range(2):
             print(random.randint(1, 10), end=" ")
     print()

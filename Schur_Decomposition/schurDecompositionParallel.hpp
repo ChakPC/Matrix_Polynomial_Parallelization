@@ -66,7 +66,7 @@ inline vector<complexMatrix> computeQRParallel(complexMatrix &inputMatrix) {
             int row = diff + col;
             if (inputMatrix[row][col] != complexNumber(0, 0)) {
                 complexNumber factor = R[row][col] / R[col][col];
-                if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1)) {
+                if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1) || R[col][col] == complexNumber(0, 0)) {
                     flag = 1;
                 }
                 if (!flag) {

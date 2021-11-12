@@ -40,6 +40,7 @@ inline vector<complexMatrix> computeQRSerial(complexMatrix &inputMatrix) {
     for (int i = 1; i < sizeOfMatrix; i++) {
         for (int j = 0; j < i; j++) {
             if (inputMatrix[i][j] == complexNumber(0, 0)) continue;
+            if(R[j][j] == complexNumber(0, 0)) return {};
             complexNumber factor = R[i][j] / R[j][j];
             if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1)) {
                 return {};
