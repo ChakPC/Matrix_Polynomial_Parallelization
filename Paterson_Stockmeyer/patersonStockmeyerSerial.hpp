@@ -1,4 +1,3 @@
-#include "../complexMatrixSerial.hpp"
 /*
  * Function to compute powers of input matrix till exponent limit
  * @param inputMatrix matrix for calculating powers

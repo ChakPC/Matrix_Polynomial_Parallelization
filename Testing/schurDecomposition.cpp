@@ -5,7 +5,7 @@
 #include "../Schur_Decomposition/schurDecompositionParallel.hpp"
 
 TEST_CASE("Schur Decomposition Random Test", "") {
-    system("python3 testSchurDecomposition.py 2");
+    system("python3 testGeneratorSchurDecomposition.py 2");
     freopen("input.txt", "r", stdin);
     int n;
     cin >> n;
