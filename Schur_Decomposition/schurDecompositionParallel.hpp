@@ -41,16 +41,51 @@ inline vector<complexMatrix> computeQRParallel(complexMatrix &inputMatrix) {
     int sizeOfMatrix = inputMatrix.size();
     complexMatrix R = inputMatrix;
     complexMatrix QTranspose = identityMatrixParallel(sizeOfMatrix);
-    for (int i = 1; i < sizeOfMatrix; i++) {
-        for (int j = 0; j < i; j++) {
-            if (inputMatrix[i][j] == complexNumber(0, 0)) continue;
-            complexNumber factor = R[i][j] / R[j][j];
-            if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1)) {
-                return {};
+    for(int diff = 1; diff < sizeOfMatrix; diff++){
+        int limit = sizeOfMatrix - diff - 1;
+        int flag = 0;
+        #pragma omp parallel for
+        for(int col = 0; col < limit; col += 2){
+            int row = diff + col;
+            if(inputMatrix[row][col] != complexNumber(0, 0)){
+                complexNumber factor = R[row][col] / R[col][col];
+                if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1)) {
+                    flag = 1;
+                }
+                if(!flag){
+                    auto G = computeGivensParallel(row, col, sizeOfMatrix, R[row][col], R[col][col]);
+                    #pragma omp critical
+                    {
+                        QTranspose = multG(G, QTranspose, row, col);
+                        R = multG(G, R, row, col);
+                    }
+                }
             }
-            auto G = computeGivensParallel(i, j, sizeOfMatrix, R[i][j], R[j][j]);
-            QTranspose = multG(G, QTranspose, i, j);
-            R = multG(G, R, i, j);
+        }
+        if(flag){
+            return {};
+        }
+        flag = 0;
+        #pragma omp parallel for
+        for(int col = 1; col < limit; col += 2){
+            int row = diff + col;
+            if(inputMatrix[row][col] != complexNumber(0, 0)){
+                complexNumber factor = R[row][col] / R[col][col];
+                if (factor == complexNumber(0, 1) || factor == complexNumber(0, -1)) {
+                    flag = 1;
+                }
+                if(!flag){
+                    auto G = computeGivensParallel(row, col, sizeOfMatrix, R[row][col], R[col][col]);
+                    #pragma omp critical
+                    {
+                        QTranspose = multG(G, QTranspose, row, col);
+                        R = multG(G, R, row, col);
+                    }
+                }
+            }
+        }
+        if(flag){
+            return {};
         }
     }
 
