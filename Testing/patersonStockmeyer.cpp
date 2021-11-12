@@ -1,6 +1,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "../complexMatrix.hpp"
+#include "../complexMatrixSerial.hpp"
+#include "../complexMatrixParallel.hpp"
 #include "../Paterson_Stockmeyer/patersonStockmeyerParallel.hpp"
 #include "../Paterson_Stockmeyer/patersonStockmeyerSerial.hpp"
 
@@ -61,7 +63,7 @@ TEST_CASE("Paterson Stockmeyer Parallel (complex)", "") {
 }
 
 TEST_CASE("Paterson Stockmeyer stress test", "") {
-    system("python3 testGeneratorPatersonStockmeyer.py 500");
+    system("python3 testGeneratorPatersonStockmeyer.py 100");
     freopen("input.txt", "r", stdin);
     int n;
     cin >> n;
