@@ -1,7 +1,8 @@
-// Header file for serial Implementation of Paterson - Stockmeyer algorithm
-
-// Function to compute powers of input matrix till exponent limit
-// Brute Force Implmentation: O(limit * n * n)
+/*
+ * Function to compute powers of input matrix till exponent limit
+ * @param inputMatrix matrix for calculating powers
+ * @param limit exponent limit
+ */
 inline vector<complexMatrix> computePowersSerial(complexMatrix &inputMatrix, int limit) {
     int sz = inputMatrix.size();
     vector<complexMatrix> res(limit + 1, complexMatrix(sz, vector<complexNumber>(sz, complexNumber(0.0, 0.0))));
@@ -16,7 +17,13 @@ inline vector<complexMatrix> computePowersSerial(complexMatrix &inputMatrix, int
     return res;
 }
 
-// Serial Implementation of Paterson Stockmeyer
+/*
+ * Serial Implementation of Paterson Stockmeyer
+ * @param inputMatrix complex Matrix
+ * @param coefficients vector of complex numbers
+ * @param polynomialVariable exponent limit for computing powers
+ * @param polynomialDegree degree of polynomial
+ */
 inline complexMatrix patersonStockmeyerSerial(complexMatrix &inputMatrix, vector<complexNumber> &coefficients, int polynomialVariable, int polynomialDegree) {
     int inputMatrixSize = inputMatrix.size();
     int degree = coefficients.size() - 1;
