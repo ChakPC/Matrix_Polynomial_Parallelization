@@ -1,7 +1,10 @@
-// Header file for serial Implementation of Sylvester Equation Solver
-
-// Function to compute K = Iq * A - B.T * Ip
-// * denotes kronecker product
+/*
+ * Function to compute K =
+ * denotes kronecker product
+ * @param A Matrix A
+ * @param B Matrix B
+ * @return K (Iq * A - B.T * Ip, where * is Kronecker product)
+ */
 inline complexMatrix computeKSerial(complexMatrix &A, complexMatrix &B) {
     int p = A.size();
     int q = B.size();
@@ -15,11 +18,13 @@ inline complexMatrix computeKSerial(complexMatrix &A, complexMatrix &B) {
     return res;
 }
 
-// Function to solve sylvester equation AX - XB = C
-// A: sqaure matrix (p x p)
-// B: square matrix (q x q)
-// X: (p x q) matrix
-// C: (p x q) matrix
+/*
+ * Function to solve sylvester equation AX - XB = C
+ * @param A square Matrix (p x p)
+ * @param B square Matrix (q x q)
+ * @param C (p x q) matrix
+ * @return X, result of sylvester Equation
+ */
 inline complexMatrix sylvesterEquationSolverSerial(complexMatrix A, complexMatrix B, complexMatrix C) {
     int p = A.size(), q = B.size();
     complexMatrix x(p * q, vector<complexNumber>(1, complexNumber(0, 0)));
