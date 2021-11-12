@@ -61,7 +61,7 @@ TEST_CASE("Paterson Stockmeyer Parallel (complex)", "") {
 }
 
 TEST_CASE("Paterson Stockmeyer stress test", "") {
-    system("python3 tests_generator.py");
+    system("python3 testGeneratorPatersonStockmeyer.py 500");
     freopen("input.txt", "r", stdin);
     int n;
     cin >> n;
