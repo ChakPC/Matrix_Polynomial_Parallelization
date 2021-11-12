@@ -7,8 +7,8 @@
 #include "Schur_Decomposition/schurDecompositionParallel.hpp"
 #include "Sylvester_Equation_Solver/sylvesterEquationSolverSerial.hpp"
 #include "Sylvester_Equation_Solver/sylvesterEquationSolverParallel.hpp"
-#include "parlettRecurrence/parletRecurrenceParallel.hpp"
-#include "parlettRecurrence/parletRecurrenceSerial.hpp"
+#include "Parlett_Recurrence/parletRecurrenceParallel.hpp"
+#include "Parlett_Recurrence/parletRecurrenceSerial.hpp"
 
 #define matrixSizeLimit 5
 #define polynomialDegreeLimit 5
