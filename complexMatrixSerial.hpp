@@ -1,4 +1,9 @@
-
+/*
+ * add complex matrices serially
+ * @param A Matrix A
+ * @param B Matrix B
+ * @return A+B
+ */
 complexMatrix addSerial(complexMatrix &A, complexMatrix &B) {
     int row = A.size(), col = A[0].size();
     complexMatrix res(row, vector<complexNumber>(col, complexNumber(0.0, 0.0)));
@@ -10,6 +15,12 @@ complexMatrix addSerial(complexMatrix &A, complexMatrix &B) {
     return res;
 }
 
+/*
+ * multiply complex matrices serially
+ * @param A coefficient A
+ * @param B Matrix B
+ * @return A*B
+ */
 complexMatrix multiplySerial(complexNumber coeff, complexMatrix &matrix) {
     int row = matrix.size(), col = matrix[0].size();
     complexMatrix res(row, vector<complexNumber>(col, {0.0, 0.0}));
@@ -21,6 +32,12 @@ complexMatrix multiplySerial(complexNumber coeff, complexMatrix &matrix) {
     return res;
 }
 
+/*
+ * multiply complex matrices serially
+ * @param A Matrix A
+ * @param B Matrix B
+ * @return A*B
+ */
 complexMatrix multiplySerial(complexMatrix &A, complexMatrix &B) {
     int rowA = A.size(), colA = A[0].size(), rowB = B.size(), colB = B[0].size();
     complexMatrix res(rowA, vector<complexNumber>(colB, {0.0, 0.0}));
@@ -34,6 +51,10 @@ complexMatrix multiplySerial(complexMatrix &A, complexMatrix &B) {
     return res;
 }
 
+/*
+ * Transforms matrix values to zero if they are smaller than zeroLimit
+ * @param inputMatrix The input matrix to transform
+ */
 inline void processZeroSerial(complexMatrix &inputMatrix) {
     int row = inputMatrix.size(), col = inputMatrix[0].size();
     for (int i = 0; i < row; i++) {
@@ -48,6 +69,13 @@ inline void processZeroSerial(complexMatrix &inputMatrix) {
     }
 }
 
+/*
+ * check if two matrices are equal by checking if the difference between two
+ * values is smaller than zeroLimit
+ * @param A Matrix A
+ * @param B Matrix B
+ * @return true if A == B else false
+ */
 bool areMatricesEqualSerial(complexMatrix &A, complexMatrix &B) {
     if (A.size() != B.size() || A[0].size() != B[0].size()) return false;
     bool flag = false;
@@ -63,8 +91,11 @@ bool areMatricesEqualSerial(complexMatrix &A, complexMatrix &B) {
     return true;
 }
 
-// Function to return transpose of a complex matrix
-// Returns the conjugate transpose
+/*
+ * calculate conjugate transpose of a matrix
+ * @param inputMatrix matrix for which conjugate transpose is to be calculated
+ * @return conjugate transpose of inputMatrix
+ */
 inline complexMatrix transposeMatrixSerial(complexMatrix &inputMatrix) {
     int n = inputMatrix.size();
     complexMatrix newMatrix(n, vector<complexNumber>(n, complexNumber(0, 0)));
@@ -78,6 +109,11 @@ inline complexMatrix transposeMatrixSerial(complexMatrix &inputMatrix) {
     return newMatrix;
 }
 
+/*
+ * create a new identity matrix
+ * @param n size of identity matrix
+ * @return new identity matrix of size n
+ */
 inline complexMatrix identityMatrixSerial(int n) {
     complexMatrix res(n, vector<complexNumber>(n, complexNumber(0.0, 0.0)));
     for (int i = 0; i < n; i++) {
@@ -86,7 +122,12 @@ inline complexMatrix identityMatrixSerial(int n) {
     return res;
 }
 
-// Function to compute kronecker product of A and B
+/*
+ * calculate Kronecker Product of matrices
+ * @param A Matrix A
+ * @param B Matrix B
+ * @return Kronecker Product of A and B
+ */
 inline complexMatrix computeKroneckerProductSerial(complexMatrix &A, complexMatrix &B) {
     int rA = A.size(), cA = A[0].size();
     int rB = B.size(), cB = B[0].size();
@@ -107,7 +148,11 @@ inline complexMatrix computeKroneckerProductSerial(complexMatrix &A, complexMatr
     return res;
 }
 
-// Function to stack columns of a matrix atop each other from left to right
+/*
+ * stack columns of a matrix atop each other from left to right
+ * @param inputMatrix matrix for stacking
+ * @return column Stacked Matrix of inputMatrix
+ */
 inline complexMatrix columnStackSerial(complexMatrix &inputMatrix) {
     int p = inputMatrix.size(), q = inputMatrix[0].size();
     complexMatrix res(p * q, vector<complexNumber>(1, complexNumber(0, 0)));
@@ -121,7 +166,11 @@ inline complexMatrix columnStackSerial(complexMatrix &inputMatrix) {
     return res;
 }
 
-// Function to convert column stacked matrix back to standard form
+/*
+ * Function to convert column stacked matrix back to standard form
+ * @param inputMatrix matrix for reverse stacking
+ * @return reverse stacked matrix for inputMatrix
+ */
 inline complexMatrix reverseStackingSerial(complexMatrix &inputMatrix, int rows) {
     int prod = inputMatrix.size();
     int cols = prod / rows;
@@ -136,7 +185,11 @@ inline complexMatrix reverseStackingSerial(complexMatrix &inputMatrix, int rows)
     return res;
 }
 
-// Check for clustered Eigen Values
+/*
+ * check if clustered eigen values are present in a matrix
+ * @param T matrix
+ * @return true if clustered eigen values are present else false
+ */
 inline bool checkClusteredEigenValuesSerial(complexMatrix &T) {
     int size = T.size();
     vector<complexNumber> eigenValues;
@@ -159,7 +212,13 @@ inline bool checkClusteredEigenValuesSerial(complexMatrix &T) {
     return 0;
 }
 
-// Function to update a row for gauss elimination
+/*
+ * update a row for gauss elimination
+ * @param A Matrix A
+ * @param B Matrix B
+ * @param i row number (0 based)
+ * @param j column number (0 based)
+ */
 inline void updateRowSerial(complexMatrix &A, complexMatrix &B, int i, int j) {
     int size = A.size();
     if (A[i][i] == complexNumber(0, 0)) {
@@ -184,7 +243,12 @@ inline void updateRowSerial(complexMatrix &A, complexMatrix &B, int i, int j) {
     B[j][0] = B[j][0] - (factor * B[i][0]);
 }
 
-// Function to perform Gauss Elimination
+/*
+ * perform Gauss Elimination
+ * @param A Matrix A
+ * @param B Matrix B
+ * @return Gauss Elimination result
+ */
 inline complexMatrix gaussEliminationSerial(complexMatrix &A, complexMatrix &B) {
     // Ax = B
     int size = A.size();

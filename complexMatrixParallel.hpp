@@ -175,7 +175,6 @@ inline complexMatrix columnStackParallel(complexMatrix &inputMatrix) {
     return res;
 }
 
-//
 /*
  * Function to convert column stacked matrix back to standard form
  * @param inputMatrix matrix for reverse stacking
@@ -194,7 +193,6 @@ inline complexMatrix reverseStackingParallel(complexMatrix &inputMatrix, int row
     return res;
 }
 
-// Check for clustered Eigen Values
 /*
  * check if clustered eigen values are present in a matrix
  * @param T matrix

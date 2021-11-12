@@ -1,7 +1,13 @@
-// Header file for serial Implementation of Schur Decomposition
-
-// Function to compute Givens matrix for given i, j
-// Theta computed as such that after rotation, the value at (i, j) becomes 0
+/*
+ * Function to compute Givens matrix for given i, j
+ * Theta computed as such that after rotation, the value at (i, j) becomes 0
+ * @param i row (0 based indexing)
+ * @param j column (0 based indexing)
+ * @param sizeOfMatrix size of matrix on which givens is to be calculated
+ * @param Aij value in i'th row and j'th column of Matrix
+ * @param Ajj value in j'th row and j'th column of Matrix
+ * @return Given's matrix
+ */
 inline complexMatrix computeGivensSerial(int i, int j, int sizeOfMatrix, complexNumber Aij, complexNumber Ajj) {
     // Compute theta
     complexNumber theta = atan((complexNumber(-1.0, 0.0) * Aij) / (Ajj));
@@ -22,6 +28,11 @@ inline complexMatrix computeGivensSerial(int i, int j, int sizeOfMatrix, complex
     return Givens;
 }
 
+/*
+ * compute QR decomposition of matrix
+ * @param inputMatrix matrix for which QR decomposition is to be calculated
+ * @return vector of complex Number, [0] => Q Matrix, [1] => R Matrix
+ */
 inline vector<complexMatrix> computeQRSerial(complexMatrix &inputMatrix) {
     int sizeOfMatrix = inputMatrix.size();
     complexMatrix R = inputMatrix;
@@ -44,7 +55,12 @@ inline vector<complexMatrix> computeQRSerial(complexMatrix &inputMatrix) {
     return {Q, R};
 }
 
-// Function to perform iterations of Schur Decomposition
+/*
+ * Function to perform iterations of Schur Decomposition
+ * @param inputMatrix matrix for calculating Schur Decomposition
+ * @param numberOfIterations total iterations to perform schur decomposition
+ * @return vector of complex Matrix, [0] => Q (unitary matrix), [1] => upper triangular matrix
+ */
 inline vector<complexMatrix> schurDecompositionSerial(complexMatrix inputMatrix, int numberOfIterations) {
     complexMatrix Q, R;
     complexMatrix QFinal = identityMatrixSerial(inputMatrix.size());
