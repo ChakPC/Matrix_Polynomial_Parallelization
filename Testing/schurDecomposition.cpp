@@ -1,6 +1,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "../complexMatrix.hpp"
+#include "../complexMatrixSerial.hpp"
+#include "../complexMatrixParallel.hpp"
 #include "../Schur_Decomposition/schurDecompositionSerial.hpp"
 #include "../Schur_Decomposition/schurDecompositionParallel.hpp"
 

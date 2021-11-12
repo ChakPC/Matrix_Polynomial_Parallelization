@@ -8,8 +8,8 @@
 #include "Sylvester_Equation_Solver/sylvesterEquationSolverSerial.hpp"
 #include "Sylvester_Equation_Solver/sylvesterEquationSolverParallel.hpp"
 
-#define matrixSizeLimit 10
-#define polynomialDegreeLimit 10
+#define matrixSizeLimit 5
+#define polynomialDegreeLimit 5
 
 // Function to construct blocks in quasi upper triangular matrix based on diagonal values
 tuple<int, map<pair<int, int>, complexMatrix>, map<pair<int, int>, pair<int, int>>> constructBlocksSerial(complexMatrix &inputMatrix) {
@@ -91,18 +91,18 @@ tuple<int, map<pair<int, int>, complexMatrix>, map<pair<int, int>, pair<int, int
         }
     }
 
-    // Store off-diagonal blocks
-    #pragma omp parallel for
+// Store off-diagonal blocks
+#pragma omp parallel for
     for (int i = 1; i <= count; i++) {
-        int start = i+1;
-        #pragma omp parallel for
+        int start = i + 1;
+#pragma omp parallel for
         for (int j = start; j <= count; j++) {
             int row = res[{i, i}].size();
             int col = res[{j, j}].size();
             complexMatrix block(row, vector<complexNumber>(col));
             int rowStart = limits[{i, i}].first;
             int colStart = limits[{j, j}].second;
-            #pragma omp parallel for collapse(2)
+#pragma omp parallel for collapse(2)
             for (int x = rowStart; x < rowStart + row; x++) {
                 for (int y = colStart; y < colStart + col; y++) {
                     block[x - rowStart][y - colStart] = inputMatrix[x][y];
@@ -201,7 +201,7 @@ complexMatrix parlettRecurrenceSerial(complexMatrix &A, vector<complexNumber> &c
 }
 
 // Function to compute matrix polynomial using Blocked Parlett Recurrence parallely
-complexMatrix parlettRecurrenceParallel(complexMatrix &A, vector<complexNumber> &coeff, int numOfIterations, int PS_p, int PS_s){
+complexMatrix parlettRecurrenceParallel(complexMatrix &A, vector<complexNumber> &coeff, int numOfIterations, int PS_p, int PS_s) {
     // Schur Decomposition
     vector<complexMatrix> schur = schurDecompositionParallel(A, numOfIterations);
     if (schur.size() == 0) {
@@ -228,7 +228,7 @@ complexMatrix parlettRecurrenceParallel(complexMatrix &A, vector<complexNumber> 
 
     // Compute function for diagonal blocks using Paterson Stockmeyer
     int size = A.size();
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 1; i <= numOfBlocks; i++) {
         complexMatrix computedBlock = patersonStockmeyerParallel(blocks[{i, i}], coeff, PS_p, PS_s);
         processZeroParallel(computedBlock);
@@ -237,7 +237,7 @@ complexMatrix parlettRecurrenceParallel(complexMatrix &A, vector<complexNumber> 
 
     // Compute function for off-diagonal blocks in diagonal fashion using Sylvester Equation Solver
     for (int diff = 1; diff < numOfBlocks; diff++) {
-        #pragma omp parallel for
+#pragma omp parallel for
         for (int i = 1; i <= numOfBlocks - diff; i++) {
             int j = i + diff;
             complexMatrix SES_A = blocks[{i, i}];
@@ -260,16 +260,16 @@ complexMatrix parlettRecurrenceParallel(complexMatrix &A, vector<complexNumber> 
 
     // Resultant function matrix for quasi upper triangular matrix
     complexMatrix functionOnT(size, vector<complexNumber>(size, complexNumber(0, 0)));
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 1; i <= numOfBlocks; i++) {
         int start = i;
-        #pragma omp parallel for
+#pragma omp parallel for
         for (int j = start; j <= numOfBlocks; j++) {
             int rowStart = limits[{i, i}].first;
             int colStart = limits[{j, j}].second;
             int row = computedBlocks[{i, j}].size();
             int col = computedBlocks[{i, j}][0].size();
-            #pragma omp parallel for collapse(2)
+#pragma omp parallel for collapse(2)
             for (int x = rowStart; x < rowStart + row; x++) {
                 for (int y = colStart; y < colStart + col; y++) {
                     functionOnT[x][y] = computedBlocks[{i, j}][x - rowStart][y - colStart];
@@ -290,7 +290,7 @@ complexMatrix parlettRecurrenceParallel(complexMatrix &A, vector<complexNumber> 
 }
 
 int main() {
-    freopen("inputs/driver[33].txt", "r", stdin);
+    freopen("./Analytics/patersonStockmeyer/input.txt", "r", stdin);
     // Take Input
     int n;
     cin >> n;
@@ -311,7 +311,7 @@ int main() {
         coeff[i] = {a, b};
     }
 
-    if(A.size() <= matrixSizeLimit || d <= polynomialDegreeLimit){
+    if (A.size() <= matrixSizeLimit || d <= polynomialDegreeLimit) {
         // Output from Paterson Stockmeyer Serial
         complexMatrix patersonStockmeyerSerialResult = patersonStockmeyerSerial(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
         printMatrix(patersonStockmeyerSerialResult);
@@ -319,8 +319,7 @@ int main() {
         // Output from Paterson Stockmeyer Parallel
         complexMatrix patersonStockmeyerParallelResult = patersonStockmeyerParallel(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
         printMatrix(patersonStockmeyerParallelResult);
-    }
-    else{
+    } else {
         // Output from Parlett Recurrence Serial
         complexMatrix parlettRecurrenceSerialResult = parlettRecurrenceSerial(A, coeff, 10, sqrt(d) + 1, sqrt(d) + 1);
         printMatrix(parlettRecurrenceSerialResult);
