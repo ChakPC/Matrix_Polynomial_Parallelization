@@ -90,20 +90,20 @@ However, there exists some optimal algorithms to evaluate matrix polynomials in 
     \item Parlett Recurrence Algorithm
 \end{enumerate}
 
-Paterson Stockmeyer algorithm is a robust algorithm which re-orders the polynomial and reduces the dependence of time complexity on the degree of the polynomial. It's overall time complexity is $O(n^{3}\sqrt{d})$. The details of the theory of Paterson Stockmeyer algorithm are given in section 2. The implementation and parallelization techniques are described in section 3.
+\textbf{Paterson Stockmeyer algorithm} is a robust algorithm which re-orders the polynomial and reduces the dependence of time complexity on the degree of the polynomial. It's overall time complexity is $O(n^{3}\sqrt{d})$. The details of the theory of Paterson Stockmeyer algorithm are given in section 2. The implementation and parallelization techniques are described in section 3.
 
-Parlett Recurrence algorithm is even more efficient algorithm with time complexity $O(n^{3})$. But, it is numerically unstable for some cases which will be illustrated in section 2. This numerical instability can be removed using diagonal block re-orddering of Schur decomposed form of the input matrix. But, the implementation of the same is quite involved both algorithmically and theoretically and hence, we have left the same for future developments of the project. Also, there are some more edge cases which are specific to the implementation of the internal components of Parlett Recurrence algorithm. Moreover, the constant term of the time complexity is very high. Hence, this algorithm works better than Paterson Stockmeyer algorithm only for large matrices and high degree polynomials. We will use this fact to design our overall algorithm which will be described in section 3.
+\textbf{Parlett Recurrence algorithm} is even more efficient algorithm with time complexity $O(n^{3})$. But, it is numerically unstable for some cases which will be illustrated in section 2. This numerical instability can be removed using diagonal block re-orddering of Schur decomposed form of the input matrix. But, the implementation of the same is quite involved both algorithmically and theoretically and hence, we have left the same for future developments of the project. Also, there are some more edge cases which are specific to the implementation of the internal components of Parlett Recurrence algorithm. Moreover, the constant term of the time complexity is very high. Hence, this algorithm works better than Paterson Stockmeyer algorithm only for large matrices and high degree polynomials. We will use this fact to design our overall algorithm which will be described in section 3.
 
 \newpage
-In our implementation, we are going to use a blocked version of Parlett Recurrence algorithm to take advantages of our parallelized matrix multiplication algorithm which will be described in section 3. There are 2 components which are integral part of blocked Parlett Recurrence algorithm which are as follows:
+In our implementation, we are going to use a \textbf{blocked} version of Parlett Recurrence algorithm to take advantages of our \underline{Parallelized Matrix Multiplication Algorithm} which will be described in section 3. There are 2 components which are integral part of blocked Parlett Recurrence algorithm which are as follows:
 \begin{enumerate}
     \item Schur Decomposition
     \item Sylvester Equation Solver
 \end{enumerate}
 
-Schur Decomposition involves a numerical method known as $QR$ method. For this, we need to perform a QR decomposition. There are various ways to perform the same. To name a few, Gram-Schmidt method, Householder method, Given's rotation method are used for the same. We have chosen to incorporate Given's rotation technique to compute QR decomposition. There are some edge cases for which Given's rotation matrix can't be computed but this method has a lot of scope for parallelization. Since our main focus is on parallelization of the matrix polynomial evaluation, we have preferred Given's rotation technique over other techniques which have far less scope of parallelization. Details of all these sub-components will be explained in section 2 and 3.
+Schur Decomposition involves a numerical method known as \underline{$QR$} method. For this, we need to perform a QR decomposition. There are various ways to perform the same. To name a few, Gram-Schmidt method, Householder method, Given's rotation method are used for the same. We have chosen to incorporate \textbf{Given's rotation technique} to compute QR decomposition. There are some edge cases for which Given's rotation matrix can't be computed but this method has a lot of scope for parallelization. Since our main focus is on parallelization of the matrix polynomial evaluation, we have preferred Given's rotation technique over other techniques which have far less scope of parallelization. Details of all these sub-components will be explained in section 2 and 3.
 
-Sylvester Equation Solver involves various components some of which are computation of Kronecker product and Gauss Elimination. Details of the same are described in section 2 and 3. Finally, for blocked Parlett Recurrence algorithm, we first compute the Schur Decomposed form of the input matrix and then we apply Sylvester Equation Solver over all the blocks of Schur decomposed form. These details are explained in section 2 and 3.
+Sylvester Equation Solver involves various components some of which are computation of \textbf{Kronecker product} and \textbf{Gauss Elimination}. Details of the same are described in section 2 and 3. Finally, for blocked Parlett Recurrence algorithm, we first compute the Schur Decomposed form of the input matrix and then we apply Sylvester Equation Solver over all the blocks of Schur decomposed form. These details are explained in section 2 and 3.
 
 \newpage
 \section{Theory}\label{sec:lit-rev}
@@ -120,7 +120,7 @@ $$c_{i} = 0 \hspace{0.25cm} \forall \hspace{0.25cm} i > d$$
 Although we can choose any two integers $p$ and $s$, it is observed that the algorithm gives the best time complexity when $s \simeq p \simeq \sqrt{d}$. It is particularly this case when we get overall time complexity as $O(n^{3}\sqrt{d})$. This can be proved theoretically as well. Clearly, the highest degree of the rearranged polynomial must be greater than or equal to $d$. So, 
 $$p(s-1) + p-1 \geq d$$
 $$ps \geq d+1$$
-From this equation, we can clearly observe that if $p \simeq s \simeq \sqrt{d}$ then we will have to do least number of extra computations. Now, for computing this re-arranged polynomial, we will have to compute all powers of $A$ till $p$. We have developed an efficient algorithm to do this and this has been described in section 3. Then, we apply Horner's algorithm to compute the complete polynomial. Details of Horner's algorithm are discussed in section 3.
+From this equation, we can clearly observe that if $p \simeq s \simeq \sqrt{d}$ then we will have to do least number of extra computations. Now, for computing this re-arranged polynomial, we will have to compute all powers of $A$ till $p$. We have developed an efficient algorithm to do this and this has been described in section 3. Then, we apply \textbf{Horner's algorithm} to compute the complete polynomial. Details of Horner's algorithm are discussed in section 3.
 \newpage
 \subsection{Schur Decomposition}
 
@@ -190,18 +190,18 @@ Here, red blocks denote the diagonal blocks and the white blocks are the off-dia
 
 $F_{ii}$ can be calculated for all diagonal blocks efficiently using Paterson-Stockmeyer algorithm as subroutine. Now, the original relation proposed by Parlett is
 $$f_{ij} = \frac{f_{ii}t_{ij} - t_{ij}f_{jj}}{t_{ii} - t{jj}} + \sum_{k=i+1}^{j-1}\frac{f_{ik}t_{kj} - t_{ik}f_{kj}}{t_{ii} - t_{jj}}$$
-Here, $t_{ij}$ and $f_{ij}$ represents the individual elements of the $T$ and $q(T)$ matrix respectively. From this relation, this is pretty clear that we can't calculate $f_{ij}$ if $t_{ii} = t_{jj}$. This scenario will happen if the input matrix $A$ has repeated eigen values because in that case two entries of the diagonal of real Schur form of $A$ will be equal. This is the reason we said that Parlett Recurrence method is numerically unstable for cases when input matrix $A$ has repeated eigen values.
+Here, $t_{ij}$ and $f_{ij}$ represents the individual elements of the $T$ and $q(T)$ matrix respectively. From this relation, this is pretty clear that we can't calculate $f_{ij}$ if $t_{ii} = t_{jj}$. This scenario will happen if the input matrix $A$ has \textit{repeated eigen values} because in that case two entries of the diagonal of \textit{real Schur form} of $A$ will be equal. This is the reason we said that Parlett Recurrence method is numerically unstable for cases when input matrix $A$ has repeated eigen values.
 
 However, rather than computing each entry seperately, we have implemented a blocked version of the Parlett Recurrence so that we can take advantages of our parallelized matrix multiplication algorithm. But, this version also suffers from repeated eigen value problem because Sylvester Equation can't give unique solution in this case. 
 \newpage
 The blocked Parlett recurrence relation to calculate $F_{ij}$ can be written as follows 
 $$T_{ii}F_{ij} - F_{ij}T_{jj} = F_{ii}T_{ij} - T_{ij}F_{jj} + \sum_{k=i+1}^{j-1}(F_{ik}T_{kj} - T_{ik}F_{kj})$$ 
 
- Now, this is a Sylvester Equation where we have to compute $F_{ij}$. It can be easily noticed that each off-diagonal block $F_{ij}$ is only dependent on values of blocks to the left of it and below it. Since RHS must be known for solving this Sylvester equation, we have to compute these blocks before computing $F_{ij}$. There emerge two ways to calculate $F$ matrix:
+ Now, this is a Sylvester Equation where we have to compute $F_{ij}$. It can be easily noticed that each \textit{off-diagonal block} $F_{ij}$ is only dependent on values of blocks to the left of it and below it. Since RHS must be known for solving this Sylvester equation, we have to compute these blocks before computing $F_{ij}$. There emerge two ways to calculate $F$ matrix:
 \begin{enumerate}
-    \item Block diagonal partitioning: If we define diagonal $d'$ to consist of all $F_{ij}$ blocks for which $j = i + d'$ then each diagonal $d'$ is only dependent on diagonals $d''<d'$ (diagonals to the left of d). Blocks within each diagonal can be calculated independently of each other which means they can all be calculated parallely quite efficiently.  
+    \item \textbf{Block diagonal partitioning}: If we define diagonal $d'$ to consist of all $F_{ij}$ blocks for which $j = i + d'$ then each diagonal $d'$ is only dependent on diagonals $d''<d'$ (diagonals to the left of d). Blocks within each diagonal can be calculated independently of each other which means they can all be calculated parallely quite efficiently.  
     \vspace{0.5cm}
-    \item Block column partitioning: We can divide $T$ into blocks column-wise and calculate them in appropriate order sequentially from left to right. 
+    \item \textbf{Block column partitioning}: We can divide $T$ into blocks column-wise and calculate them in appropriate order sequentially from left to right. 
 \end{enumerate}
 
 We have chosen block diagonal partitioning due to its rather straightforward implementation and more explicit parallelization than column partitioning.
@@ -337,14 +337,14 @@ In the figure all the blocks of same color can be computed in parallel. Hence, w
 \newpage
 \section{Evaluation}
 All the testing and evaluation of the code was done on an Intel i7 10th gen 2.6 GHz processor with 6 physical cores and support for hyperthreading. \\
-Note: The evaluation has been done on a laptop with various other heavy processes running parallely along with this program. Hence, the threads were continuously switching context and that's why we had 4X speedup with 8 threads 
+
 
 
 \begin{center}
-\begin{tabular}{||c c||} 
+\begin{tabular}{|c|c|} 
  \hline
- Component & Speedup \\ [0.5ex] 
- \hline\hline
+ \textbf{Component} & \textbf{Speedup(Approx.)} \\ [0.5ex] 
+ \hline
  Paterson Stockmeyer & 4 \\ 
  \hline
  Schur Decomposition & 5\\
@@ -356,33 +356,36 @@ Note: The evaluation has been done on a laptop with various other heavy processe
 \end{tabular}
 \end{center}
 
-\begin{figure}[h]
+\begin{center}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{schur.png}
+    \includegraphics[width=0.9\textwidth]{schur.png}
     \caption{Order of Execution of schur decomposition}
 \end{figure}
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{patersonStockmeyer.jpeg}
+    \includegraphics[width=0.9\textwidth]{patersonStockmeyer.jpeg}
     \caption{Order of Execution of Paterson Stockmeyer}
 \end{figure}
 
 
-\begin{figure}[!htb]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{parlett.png}
+    \includegraphics[width=0.9\textwidth]{parlett.png}
     \caption{Order of Execution of Parlett Recurrence}
 \end{figure}
 
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{sylvester.png}
+    \includegraphics[width=0.9\textwidth]{sylvester.png}
     \caption{Order of Execution of Sylvester}
 \end{figure}
+\end{center}
 
+Note: The evaluation has been done on a laptop with various other heavy processes running parallely along with this program. Hence, the threads were continuously switching context and that's why we had 4X speedup with 8 threads. Hence, we predict that our speedup will be even better if only this program is executed exclusively. That's why we omit the details of average efficiency and we just provide the details of speedup 
 
-\newpage     
+\newpage
 \section{Conclusion}
 
 We have proposed two optimal algorithms for evaluating matrix polynomials. Paterson Stockmeyer is a robust algorithm with time complexity $O(n^3\sqrt{d})$. We explained the sub-components of this method which includes computing of powers of $A$ till $p$ and Horner's method. We also gave a parallelized solution for the same. We also gave another method Parlett Recurrence method which is asymptotically better because it has time complexity $O(n^3)$. But, the constant term for the same is very high and it fails on some edge cases too. Parlett Recurrence comprises of two sub-routines Schur Decomposition and Sylvester Equation Solver. For Schur Decomposition, we chose $QR$ method and for $QR$ decomposition, we are using Given's rotations. We have also gave various optimisations and parallelisation techniques for the same. We used Gauss Elimination for solving Sylvester Equation and also parallelized it. Finally, in Parlett Recurrence we propose a diagonal block partitioning method and we also parallelized it. At last, we evaluated our model and we found the speedup to be about 4X for both Paterson Stockmeyer and Parlett Recurrence even for matrices with relatively smaller dimensions and polynomials with relatively lower degree. We predict that the performance will be better for even larger matrices and higher degree polynomials but we have kept that for future developments of the project due to limitation of access to computing power.
