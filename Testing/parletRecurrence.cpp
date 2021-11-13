@@ -9,9 +9,11 @@
 #include "../Sylvester_Equation_Solver/sylvesterEquationSolverParallel.hpp"
 #include "../Paterson_Stockmeyer/patersonStockmeyerParallel.hpp"
 #include "../Paterson_Stockmeyer/patersonStockmeyerSerial.hpp"
+#include "../Parlett_Recurrence/parletRecurrenceParallel.hpp"
+#include "../Parlett_Recurrence/parletRecurrenceSerial.hpp"
 
 TEST_CASE("Paterson Stockmeyer stress test", "") {
-    system("python3 testGeneratorPatersonStockmeyer.py 100");
+    system("python3 testGeneratorPatersonStockmeyer.py 50");
     freopen("input.txt", "r", stdin);
     int n;
     cin >> n;
@@ -33,12 +35,12 @@ TEST_CASE("Paterson Stockmeyer stress test", "") {
     }
     omp_set_num_threads(1);
     double start = omp_get_wtime();
-    complexMatrix resSerial = patersonStockmeyerSerial(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    complexMatrix resSerial = parlettRecurrenceSerial(A, coeff, 10, sqrt(d) + 1, sqrt(d) + 1);
     printf("S: %f\n", omp_get_wtime() - start);
     start = omp_get_wtime();
 
     omp_set_num_threads(8);
-    complexMatrix resParallel = patersonStockmeyerParallel(A, coeff, sqrt(d) + 1, sqrt(d) + 1);
+    complexMatrix resParallel = parlettRecurrenceParallel(A, coeff, 10, sqrt(d) + 1, sqrt(d) + 1);
     printf("P: %f\n", omp_get_wtime() - start);
     REQUIRE(areMatricesEqual(resSerial, resParallel) == true);
 }
