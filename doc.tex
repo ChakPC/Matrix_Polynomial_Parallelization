@@ -277,12 +277,13 @@ Now, we can parallelize the above algorithm. We can observe that computation of 
 \State {return {$Q_f^T$,$A$}}
 \end{algorithmic}
 \end{algorithm}
-
+There is no overall parallelization in QR method but we have used several parallel subroutines like matrix multiplication etc.
 \subsection{Sylvester Equation Solver}
 
-Sylvester Equation Solver 
+Sylvester Equation Solver involves computing Kronecker product and Gauss Elimination as sub-routines. The algorithm is as follows.
+
 \begin{algorithm}
-\caption{Sylvester Solver}\label{euclid}
+\caption{Sylvester Equation Solver}\label{euclid}
 \begin{algorithmic}[1]
 \State \text{$K=I_q\bigotimes A- I_p\bigotimes B$}
 \State {$b$ = Col($C$)}
@@ -291,9 +292,30 @@ Sylvester Equation Solver
 \end{algorithmic}
 \end{algorithm}
 
+We have parallelized both Kronecker product computation and Gauss Elimination. In Kronecker product computation, every entry of the output matrix can be computed independently and hence is done parallely. In Gauss Elimination, when we try to make the elements below the diagonal 0, we notice that we can simultaneously perform elementary row transformations for all the entries in a column below the diagonal. Hence, we have parallelized Gauss elimination in this manner. Apart form these two sub-routines, \textit{column stacking} and \textit{reverse column stacking} sub routines are also parallelized.
 
 \subsection{Blocked Parlett Recurrence}
 
+As already mentioned in section 2, we have performed block diagonal partitioning to compute the off diagonal elements of $q(T)$. In a diagonal of blocks, all blocks can be computed parallely because $F_{ij}$ depends on the computed values to the left and bottom of it only.
+Diagramatically, we can represent the partitioning as
+
+\begin{center}
+\includegraphics[width=0.30\textwidth]{Sylvester_blocks.png}
+\end{center}
+
+In the figure all the blocks of same color can be computed in parallel. Hence, we have deployed the same strategy to parallelize computations of off-diagonal elements. 
+
+\begin{algorithm}
+\caption{Blocked Parlett Recurrence}\label{euclid}
+\begin{algorithmic}[1]
+\State {$F_{ii}=f(T_{ii})$ Evaluate f on all diagonal blocks }
+\For{\textt{j = 2 : n}}
+    \For{\textt{i = j - 1 : -1 : 1}}
+        \State {Solve $T_{ii}F_{ij} - F_{ij}T_{jj} = F_{ii}T_{ij} - T_{ij}F_{jj} + \sum_{k=i+1}^{j-1}(F_{ik}T_{kj} - T_{ik}F_{kj})$}
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
 \section{Evaluation}
 
 All the testing and evaluation of the code was done on an Intel i7 10th gen 2.6 GHz processor with 6 physical cores and support for hyperthreading. 
@@ -307,6 +329,26 @@ All the testing and evaluation of the code was done on an Intel i7 10th gen 2.6 
 
 \bibliographystyle{ieeetr}
 \bibliography{refs}
+\begin{thebibliography}{9}
+\bibitem{sivan}
+Sivan Toledo and Amit Waisel: Parallel Algorithms for Evaluating Matrix Polynomials
+\bibitem{texbook}
+Amit Waisel: Parallell algorithms for evaluating matrix polynomials. Master’s
+thesis, School of Computer Science, Tel-Aviv University, 2019.
+\bibitem{wiki}
+Wikipedia: Schur decomposition
+\bibitem{wiki1}
+Wikipedia: QR Algorithm
+\bibitem{wiki2}
+Wikipedia: Givens Rotation
+\bibitem{wiki3}
+Wikipedia: 
+\bibitem{lamport94}
+Padraic Bartlett: Math108B, L5, The Schur Decomposition
+\bibitem{amit}
+Amit Waisel: Parallel Algorithms for Evaluating Matrix Polynomials
+
+\end{thebibliography}
 
 
 \end{document} 
