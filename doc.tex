@@ -28,7 +28,9 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{cite}
 \usepackage{lipsum}
-
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 
 \begin{document}
 
@@ -126,7 +128,7 @@ There is a theorem in linear algebra which states that for any complex $n \times
 $$A = Q^{H}TQ$$
 where $Q$ is a unitary matrix and $T$ is an upper triangular matrix with all eigen values of $A$ in it's diagonal. $Q^{H}$ denotes the conjugate transpose of unitary matrix $Q$. This decomposition is known as Schur Decomposition and the upper triangular matrix $T$ is called Schur form of $A$. The matrix $A$ can have complex eigen values too. But, in our implementation we have used a modified version of the Schur form. The modified Schur form is called Real Schur form of $A$ which is quasi-upper triangular in nature. All the diagonal blocks of real Schur form of $A$ are either $1 \times 1$ for real eigen values or $2 \times 2$ for complex eigen values. If we write the $2 \times 2$ diagonal block as 
 $$\begin{bmatrix}a & b \\ c & d \end{bmatrix} \hspace{0.5cm}  a, b, c, d \in \mathbb{R},\hspace{0.25cm} b < 0, \hspace{0.25cm} a = d$$
-then the two complex eigen values associated with this matrix are $a \pm i\sqrt{\mid bc \mid}$. \\ In our implementation, we have used a numerical mathod known as $QR$ method to compute the Schur decompositon. In this numerical method, we define $A_{k}$ as the upper triangular matrix generated after $k^{th}$ iteration of $QR$ method. In $k^{th}$ iteration, we first perform QR decomposition of $A_{k-1}$ to obtain $A_{k-1} = Q_{k-1}R_{k-1}$. It is to be noted that $QR$ decomposition yields a unitary matrix $Q$ and an upper triangular matrix $R$. Now, we obtain by $A_{k} = R_{k-1}Q_{k-1}$. We start the iterations with $A_{0} = A$. According to a theorem in linear algebra, after infinite iterations, $A_{k}$ will converge to a quasi-upper triangular matrix (as defined in section 1) which will have all eigen values of matrix $A$ on it's diagonal in the form of $1 \times 1$ and $2 \times 2$ blocks. The proof of this is quite involved and since it is not the focus of our project, we are omitting the proof from this documentation. \\ Now that we have obtained the quasi upper triangular matrix $T$ from $A_{k}$, we also have to compute the unitary matrix $Q$. Now, we can write the following equations
+then the two complex eigen values associated with this matrix are $a \pm i\sqrt{\mid bc \mid}$. \\ In our implementation, we have used a numerical method known as $QR$ method to compute the Schur decompositon. In this numerical method, we define $A_{k}$ as the upper triangular matrix generated after $k^{th}$ iteration of $QR$ method. In $k^{th}$ iteration, we first perform QR decomposition of $A_{k-1}$ to obtain $A_{k-1} = Q_{k-1}R_{k-1}$. It is to be noted that $QR$ decomposition yields a unitary matrix $Q$ and an upper triangular matrix $R$. Now, we obtain by $A_{k} = R_{k-1}Q_{k-1}$. We start the iterations with $A_{0} = A$. According to a theorem in linear algebra, after infinite iterations, $A_{k}$ will converge to a quasi-upper triangular matrix (as defined in section 1) which will have all eigen values of matrix $A$ on it's diagonal in the form of $1 \times 1$ and $2 \times 2$ blocks. The proof of this is quite involved and since it is not the focus of our project, we are omitting the proof from this documentation. \\ Now that we have obtained the quasi upper triangular matrix $T$ from $A_{k}$, we also have to compute the unitary matrix $Q$. Now, we can write the following equations
 $$A_{0} = Q_{0}R_{0}$$
 $$A_{1} = R_{0}Q_{0}$$
 Since $Q_{0}$ is a unitary matrix from the definition of $QR$ decomposition, we can write $Q_{0}^{H}Q_{0} = I$. Using this fact,
@@ -203,38 +205,92 @@ We have chosen block diagonal partitioning due to its rather straightforward imp
 \newpage
 \section{Implementation and Parallelization}
 We have implemented the algorithm from scratch using C++ 17 compiled on GNU G++ compiler. OpenMP was used for the development of parallel algorithms. 
-
+\begin{center}
+\includegraphics[width=0.70\textwidth]{flowchart.jpeg}
+\end{center}
 \subsection{Paterson Stockmeyer Algorithm}
 First step is to compute all powers of $A$ till power $p$. The naive way to compute and store these matrices involves p matrix multiplications which is quite expensive. However, we have come up with an efficient algorithm which is as follows:
 \begin{algorithm}
-\caption{}\label{alg:cap}
-\begin{algorithmic}
-% \Require $n \geq 0$
-% \Ensure $y = x^n$
-\State $y \gets 1$
-\State $X \gets x$
-\State $N \gets n$
-\While{$N \neq 0$}
-\If{$N$ is even}
-    \State $X \gets X \times X$
-    \State $N \gets \frac{N}{2}$  \Comment{This is a comment}
-\ElsIf{$N$ is odd}
-    \State $y \gets y \times X$
-    \State $N \gets N - 1$
-\EndIf
-\EndWhile
+\caption{Computing powers of $A$}\label{alg:cap}
+\begin{algorithmic}[1]
+\State Compute powers $A^{2}$, $A^{4}$, ..., $A^{2^{floor({log_{2}^{p}})}}$
+\State For remaining even powers, compute its decomposition in terms of already computed powers and multiply the respective matrices
+\State For all odd powers take the even power which is 1 less than it and then multiply that matrix with $A$
 \end{algorithmic}
 \end{algorithm}
-In this algorithm, 
 
+In this algorithm, we can compute all the powers of $A$ which are not a power of 2 in parallel. Now, we present the Horner's method for Paterson Stockmeyer algorithm which is as follows: 
 
-
-All the polynomial coefficients if degree p-1 can be calculated in parallel. Instead of caching $A^2,A^3,..,A^p-1$, we cache $A^2,A^4,..,A^{log_2(p-1)}$. We can then use binary representation of any exponent for calculation in O(log(exponent)) time. We then use Horner's rule to compute the polynomial q(A).
-
+% yaha PS ka code chipka
+\begin{algorithm}
+\caption{Paterson-Stockmeyer Polynomial Evaluation}\label{euclid}
+\begin{algorithmic}[1]
+\State Q = 0
+\State \text{Calculate and store A, $A^{2}$,..., $A^{p-1}$}
+ \For{\textt{q = 0 : s-1}}
+     \State {Q_p = {$c_{p.q}.I + c_{p.q+1}.A + c_{q.p+p-1}.A^{p-1}$}}
+     \State {Q = {$Q.A^p + Q_p$} \Comment{Horner's Method}
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+\newpage
+The coefficients are the polynomials in $A$. The computation of each coefficient is parallelised in each iteration. 
 
 \subsection{Schur Decomposition}
 
+The algorithm to compute QR decomposition is as follows
+
+\begin{algorithm}
+\caption{QR Decomposition}\label{euclid}
+\begin{algorithmic}[1]
+\State $R$ = $A$
+\State \text{$Q^{T}$ = $I$}
+ \For{\textt{i = 1 : size}}
+    \For{\textt{j = 0 : i}}
+        \State {$G$ = ComputeGiven($R_{ij},R_{jj}$)}
+        \State {$Q^{T} = GQ^{T}$}
+        \State {$R=GR$}
+    \EndFor
+\EndFor
+\State {return $Q,R$}
+\end{algorithmic}
+\end{algorithm}
+
+
+Now, we can parallelize the above algorithm. We can observe that computation of two Given's matrices $G_{i_{1}j_{1}}$ & $G_{i_{2}j_{2}}$ and their multiplication to obtain $Q$ and $R$ can be done in parallel if $i_{1} \neq i_{2}$ and $j_{1} \neq j_{2}$. This is because we are applying given's rotation on a matrix which is the output of another given's matrix. So, if we want to parallelise these multiplications, we need to make sure that the input of a given's rotation is the output of another given's rotation. This is a serious hindrance for parallelization but we have worked out a solution for this. We notice that in one given's rotation only two rows are affected. So if we apply given's rotations for two different pairs of rows then we can parallelise the multiplications. So, we have developed a strategy in which we compute and multiply given's matrices for alternate positions on the diagonals of the matrix. For more clarity, the following diagram is attached in which the order of execution of the cells are given. If some cell has the value 5 then we are saying that in 5th iteration, that cell will become 0 after multiplying with respective Given's matrix.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.70\textwidth]{givens.png}
+    \caption{Order of Execution}
+\end{figure}
+
+\begin{algorithm}
+\caption{Schur Decomposition}\label{euclid}
+\begin{algorithmic}[1]
+\State \text{$Q_f$ = I}
+ \For{\textt{i = 0 : numberOfIterations}}
+     \State {$Q,R$ = QRDecomposition($A$)}
+     \State {$A = RQ$}
+     \State {$Q_f$ = $Q_fQ$}
+\EndFor
+\State {return {$Q_f^T$,$A$}}
+\end{algorithmic}
+\end{algorithm}
+
 \subsection{Sylvester Equation Solver}
+
+Sylvester Equation Solver 
+\begin{algorithm}
+\caption{Sylvester Solver}\label{euclid}
+\begin{algorithmic}[1]
+\State \text{$K=I_q\bigotimes A- I_p\bigotimes B$}
+\State {$b$ = Col($C$)}
+\State {$x$ = gaussElimination(K,b)}
+\State {Obtain $X$ from $x$}
+\end{algorithmic}
+\end{algorithm}
+
 
 \subsection{Blocked Parlett Recurrence}
 
@@ -245,14 +301,6 @@ All the testing and evaluation of the code was done on an Intel i7 10th gen 2.6 
 \section{Conclusion}
 
 \section{References}
-initialize an array (powersOfInputMatrix) storing all powers of input matrix upto p.
-initialize q = polynomialDegree-1
-for(; q>=0;q--)
-    initialize an array of complexNumber (temp)
-    for(j = 0; j < polynomialVariable; j++)
-        compute index as polynomialVariable * q + j
-        if(j < degree coefficient matrix) assign coeff as coeffients[index]
-        temp = temp + coeff * powersOfInputMatrix[j]
 
 %===========================================================
 %===========================================================
