@@ -15,7 +15,7 @@ for i in range(len(lines)):
         P.append(double(a))
 
 X = []
-for i in range(10, 80, 10):
+for i in range(10, 90, 10):
     X.append(i)
 
 plt.figure(figsize=(9 * 1.5, 6 * 1.5))
@@ -24,5 +24,5 @@ plt.plot(X, S, color="green", label="parallel")
 plt.legend()
 plt.xlabel("Matrix Dimension")
 plt.ylabel("Time in seconds")
-plt.title("Schur Decomposition")
+plt.title("Parlett Recurrence")
 plt.show()

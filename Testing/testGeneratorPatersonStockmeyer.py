@@ -3,7 +3,7 @@ import sys
 
 sys.stdout = open("input.txt", "w")
 SIZE_MATRIX = (int)(sys.argv[1])
-COEFF_SIZE = 10
+COEFF_SIZE = 50
 
 print(SIZE_MATRIX)
 for i in range(SIZE_MATRIX):
