@@ -1,133 +1,264 @@
-\documentclass{article}
-\usepackage[utf8]{inputenc}
-\usepackage{graphicx}
-\usepackage{float}
-\usepackage{hyperref}
+\documentclass[12pt,a4paper]{article}
 
-\usepackage{etoolbox} %required for cover page
-\usepackage{booktabs}
-\usepackage[usestackEOL]{stackengine}
-\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{bm}
-\usepackage{graphicx}
-\usepackage{subcaption}
+\usepackage[greek,english]{babel}
+\usepackage{alphabeta} 
+
 \usepackage{amsmath}
-\usepackage{amsfonts}
 \usepackage{mathtools}
-\usepackage{xcolor}
-\usepackage{float}
-\usepackage{hyperref}
-\usepackage[capitalise]{cleveref}
-\usepackage{enumitem,kantlipsum}
-\usepackage{amssymb}
-\usepackage[square,numbers,sort]{natbib}
-\usepackage[ruled,vlined]{algorithm2e}
-\usepackage{listings}
-\usepackage{minted}
-\usemintedstyle{emacs}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\usepackage[pdftex]{graphicx}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+\linespread{1.06}
+\setlength{\parskip}{8pt plus2pt minus2pt}
+
+\widowpenalty 10000
+\clubpenalty 10000
+
+\newcommand{\eat}[1]{}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\usepackage[official]{eurosym}
+\usepackage{enumitem}
+\setlist{nolistsep,noitemsep}
+\usepackage[hidelinks]{hyperref}
+\usepackage{cite}
+\usepackage{lipsum}
+
 
 \begin{document}
 
-\begin{flushright}
-   \rule{14cm}{5pt}\vskip1cm
-    \begin{bfseries}
-        \Huge{PARALLEL ALGORITHMS FOR EVALUATING MATRIX POLYNOMIALS }\\
-        \vspace{1.5cm}
-        \LARGE{Under the guidance of : Dr. Chandresh Kumar}\\
-        \vspace{1.5cm}
-         IIT Indore Computer Science and Engineering\\
-        \vspace{1.5cm}
-         Purnadip Chakrabarti      - 190002048\\
-         Garvit Galgat         - 190001016\\
-         Vaibhav Chandra       - 190001065\\
-         Peddamallu Bhuvana Sree - 190001046\\
-         \vspace{1.5cm}
-    \end{bfseries}
-\end{flushright}
+%===========================================================
+\begin{titlepage}
+\begin{center}
+
+% Top 
+\includegraphics[width=0.40\textwidth]{Indian_Institute_of_Technology,_Indore_Logo.png}~\\[2cm]
 
 
-\section{Abstract}
-In this paper, we put forward a technique to efficiently evaluate matrix polynomials. There are several building blocks in this technique. Each of them perform a designated task. We also parallelize this technique to further improve the runtime of the algorithm. We see that the algorithm based on applying Paterson-Stockmeyer algorithm to entire matrix proves to be slow for large input matrices but is easily parallelizable. Another algorithm based on Schur Decomposition is then proposed and integrated to make a hybrid algorithm.
-
-
-\section{Introduction}
-Given a real or complex matrix A and a polynomial q with coefficients $c_0,c_1,..c_d$, we wish to compute the following matrix 
-\begin{figure}[H]
- \includegraphics[]{ps.png}
-\end{figure}
-Naive algorithm to solve this problem performs about d-1 matrix multiplications. The overall time complexity for such an algorithm is $\Theta(n^{\omega}d)$, where $\Theta(n^{\omega})$ is the complexity for matrix multiplication $\omega$ is 3 for conventional matrix multiplication and $\omega$ $\approx$ 2.7 for strassen based matrix multiplication. \par
-An important way of looking at this problem is by rearranging the polynomial, done by the Paterson and Stockmeyer algorithm. q(A) is rearranged so that it is converted into a polynomial in a power p for p < d with coefficients themselves being polynomials of degree at most p - 1. Complexity of the algorithm depends on the choice of p. A good p leads to a complexity of $\Theta(n^{\omega}\sqrt{d})$ Our technique uses this algorithm either on A itself or schur decomposition of A that we see later. \par
-Another important idea is the parlett's algorithm that reduces the matrix A to its Schur form A = QTQ*, evaluates the function for the diagonal elements of T and then uses recurrence equation to compute for the off-diagonal elements and then finally multiplies back Q to form q(A) = $Qq(T)Q^*$. The complexity of this technique is $\Theta(n^{3})$. Unfortunately, parlett's algorithm is numerically unstable. A variant of the same by Davies and Higham fixes this issue by reordering the eigenvalues to make contiguous clusters of nearly equal eigenvalues. We abstain from using this approach in our algorithm due to its very complicated implementation and less room for parallelization. We continue with parlett's algorithm in this paper.  
-Asymptotically, the parlett algorithm is always preferable but the constants involved in Schur decomposition is high. So in practise, its only beneficial to use parlett's algorithm when the d is large otherwise the Paterson-Stockmeyer gives better result. All this leads to the following flow of our algorithm.
-
-\begin{figure}[H]
- \centering
- \includegraphics[width=12cm]{flowchart.jpeg}
-\end{figure}
-
-We also try and parallelize each individual component of the algorithm. Some are easy and straightforward (matrix multiplication) but some are rather tricky (Schur decomposition). We parallelize the components we can otherwise we improve it as much as we can. 
+% Title
+\HRule \\[0.4cm]
+{ \LARGE 
+  \textbf{CS 309 \\ Parallel Computing}\\[0.4cm]
+  \emph{Parallel Algorithms for Evaluation of Matrix Polynomials}\\[0.4cm]
+}
+\HRule \\[1.5cm]
 
 
 
-\section{Algorithmic Design}
+% Author
+{ \large
+  Course Instructor: Dr. Chandresh Kumar Mourya\\[0.8cm]
+  Purnadip Chankrabarti (190002048) \\[0.1cm]
+  Garvit Galgat (190001016) \\[0.1cm]
+  Vaibhav Chandra (190001065) \\[0.1cm]
+  Peddamallu Bhuvana Sree (190001046) \\[0.1cm]
+}
 
-Our algorithm considers two approaches. If the input matrix A is sufficiently small then it does not do the expensive Schur decomposition and applies Paterson-Stockmeyer directly to A instead. The complexity of this approach is $\Theta(n^{\omega}\sqrt{d})$ along with parallelism. \par
-If dimensions of A is rather large and the degree of polynomial is high then our algorithm computes the Schur decomposition, where Q is unitary and T is upper triangular. If A is real but has complex eigenvalues then T is block triangular with blocks of size 1-by-1 or 2-by-2. Now the task reduces to evaluating q(T). T, being upper triangular, reduces the cost of computing q drastically. After we obtain q(T), we can calculate q(A) = $Qq(T)Q^*$ using just two matrix multiplications. \par
-We calculate q(T) using parlett's algorithm. First of all, $t_i_i$ is calculated for all diagonal elements. The cost of this step is $\Theta(nd)$. Then we use the recurrence relation to compute ij element of q(T). The cost of this step is $\Theta(n^3d)$. We avoid the case involving A having equal eigenvalues due to the unstable nature of parlett's recurrence. \par
+\vfill
 
 
-\subsection{Paterson-Stockmeyer Polynomial Evaluation}\par
-The paterson-stockmeyer method expresses q(A) as
-\begin{figure}[H]
- \centering
- \includegraphics[]{paterson.png}
-\end{figure}
-where p and s are integers such that ps > d. The best arithmetic efficiency is obtained when p $\approx$ s $\approx$ $\sqrt{d}$. The algorithm first evaluates and stores $A^{2},...,A^{p-1},A^{p}$. These steps can be carried out sequentially in $\Theta(\sqrt{d})$ matrix multiplication steps (each highly parallelizable).\par
-Once $I,A,A^{2},...,A^{p-1}$ are stored, we can evaluate all the coefficient polynomials
-\begin{figure}[H]
- \centering
- \includegraphics[]{coefficient_poly.png}
-\end{figure}
-We have used Horners's rule on $A^{p}$ to evaluate coefficient polynomials. In each step we multiply the accumulator in which we build up q(A) by $A^{p}$ and add the next coefficient polynomial to the accumulator. The critical path is $\Theta(slog(n)) \approx \Theta(\sqrt{d}log(n))$.
+% Bottom
+{\large \today}
+ 
+\end{center}
+\end{titlepage}
 
+\newpage
+
+%===========================================================
+\tableofcontents
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\newpage
+\setcounter{page}{1}
+
+%===========================================================
+%===========================================================
+\section{Introduction}\label{sec:intro}
+
+The problem statement that we solve in this paper is that given a real or complex matrix $A$ and a polynomial $$q(x) = \sum_{i=1}^{d} c_{i}x^{d} = c_{0} + c_{1}x + c_{2}x^{2} + ... c_{d}x^{d}$$ with real or complex coefficients $c_{0},c_{1},..c_{d}$ , we wish to compute the matrix polynomial $q(A)$. The brute-force technique to solve this involves computing all powers of matrix A and then performing $O(d)$ matrix multiplications and $O(d)$ matrix additions. If the time complexity of matrix multiplication is $O(n^{\omega})$ (where $A$ is a $n \times n$ matrix) then the time complexity of the naive algorithm is $O(n^{\omega}d)$. This is quite bad especially for large matrices and high degree polynomials. Here, $\omega$ = 3 for naive matrix multiplication and $\omega$ $\approx$ 2.7 for Strassen matrix multiplication. Although Strassen matrix multiplication is asymptotically more efficient, we have used naive matrix multiplication because the constant term of Strassen matrix multiplication is quite large and naive matrix multiplication is easily parallelizable.  
+
+However, there exists some optimal algorithms to evaluate matrix polynomials in lesser time complexity. We are going to use two algorithms for the same
+\begin{enumerate}
+    \item Paterson Stockmeyer Algorithm
+    \item Parlett Recurrence Algorithm
+\end{enumerate}
+
+Paterson Stockmeyer algorithm is a robust algorithm which re-orders the polynomial and reduces the dependence of time complexity on the degree of the polynomial. It's overall time complexity is $O(n^{3}\sqrt{d})$. The details of the theory of Paterson Stockmeyer algorithm are given in section 2. The implementation and parallelization techniques are described in section 3.
+
+Parlett Recurrence algorithm is even more efficient algorithm with time complexity $O(n^{3})$. But, it is numerically unstable for some cases which will be illustrated in section 2. This numerical instability can be removed using diagonal block re-orddering of Schur decomposed form of the input matrix. But, the implementation of the same is quite involved both algorithmically and theoretically and hence, we have left the same for future developments of the project. Also, there are some more edge cases which are specific to the implementation of the internal components of Parlett Recurrence algorithm. Moreover, the constant term of the time complexity is very high. Hence, this algorithm works better than Paterson Stockmeyer algorithm only for large matrices and high degree polynomials. We will use this fact to design our overall algorithm which will be described in section 3.
+
+\newpage
+In our implementation, we are going to use a blocked version of Parlett Recurrence algorithm to take advantages of our parallelized matrix multiplication algorithm which will be described in section 3. There are 2 components which are integral part of blocked Parlett Recurrence algorithm which are as follows:
+\begin{enumerate}
+    \item Schur Decomposition
+    \item Sylvester Equation Solver
+\end{enumerate}
+
+Schur Decomposition involves a numerical method known as $QR$ method. For this, we need to perform a QR decomposition. There are various ways to perform the same. To name a few, Gram-Schmidt method, Householder method, Given's rotation method are used for the same. We have chosen to incorporate Given's rotation technique to compute QR decomposition. There are some edge cases for which Given's rotation matrix can't be computed but this method has a lot of scope for parallelization. Since our main focus is on parallelization of the matrix polynomial evaluation, we have preferred Given's rotation technique over other techniques which have far less scope of parallelization. Details of all these sub-components will be explained in section 2 and 3.
+
+Sylvester Equation Solver involves various components some of which are computation of Kronecker product and Gauss Elimination. Details of the same are described in section 2 and 3. Finally, for blocked Parlett Recurrence algorithm, we first compute the Schur Decomposed form of the input matrix and then we apply Sylvester Equation Solver over all the blocks of Schur decomposed form. These details are explained in section 2 and 3.
+
+\newpage
+\section{Theory}\label{sec:lit-rev}
+
+\subsection{Paterson Stockmeyer Algorithm}
+
+The original polynomial $q(A)$ is written as 
+$$q(A) = \sum_{i=1}^{d} c_{i}A^{d} = c_{0}I + c_{1}A + c_{2}A^{2} + ... c_{d}A^{d}$$
+Now, according to the algorithm, we choose two integers $p$ and $s$ and we re-write $q(A)$ as
+$$q(A) = (c_{0}I + c_{1}A + .... c_{p-1}A^{p-1})(A^{p})^{0}$$ $$ + (c_{p}I + c_{p+1}A + .... c_{2p-1}A^{p-1})(A^{p})^{1}$$ $$\vdots$$ $$(c_{(s-1)p}I + c_{(s-1)p+1}A + .... c_{sp-1}A^{p-1})(A^{p})^{s-1}$$
+\\
+Basically, $q(A)$ is rewritten as a polynomial in $A^{p}$ and all the coefficients of this polynomial are themselves a polynomial in $A$ with degree at most $p-1$. It is quite obvious that if these two expressions are same then 
+$$c_{i} = 0 \hspace{0.25cm} \forall \hspace{0.25cm} i > d$$ 
+Although we can choose any two integers $p$ and $s$, it is observed that the algorithm gives the best time complexity when $s \simeq p \simeq \sqrt{d}$. It is particularly this case when we get overall time complexity as $O(n^{3}\sqrt{d})$. This can be proved theoretically as well. Clearly, the highest degree of the rearranged polynomial must be greater than or equal to $d$. So, 
+$$p(s-1) + p-1 \geq d$$
+$$ps \geq d+1$$
+From this equation, we can clearly observe that if $p \simeq s \simeq \sqrt{d}$ then we will have to do least number of extra computations. Now, for computing this re-arranged polynomial, we will have to compute all powers of $A$ till $p$. We have developed an efficient algorithm to do this and this has been described in section 3. Then, we apply Horner's algorithm to compute the complete polynomial. Details of Horner's algorithm are discussed in section 3.
+\newpage
 \subsection{Schur Decomposition}
 
-We know that having a triangular matrix as an input reduces the runtime significantly. The best method convert a matrix into its diagonal form is by Schur Decomposition. The Schur Decomposition factors A into A = $QTQ^H$ where Q is a unitary matrix and T is an upper triangular matrix. The eigenvalues of A are present on the diagonals of T. \par
-If A is real with complex eigenvalues then T is complex too. Real Schur form of a A will a quasi-upper triangular matrix with 1-by-1 and 2-by-2 blocks where each 2-by-2 block is standardized in the form [a b/ c d] b.c < 0 . Eigenvalues of such a block is a $\pm$ i$\sqrt{bc}$ \par
-The most convenient way of calculating Schur form is by the QR algorithm. f(A) = $Qf(T)Q^H$ , therefore, our task reduces to calculating f for an upper triangular matrix T. Consequently, here on our focus will be on solving f for upper triangular matrix.
+There is a theorem in linear algebra which states that for any complex $n \times n$ square matrix $A$, we can write $A$ as
+$$A = Q^{H}TQ$$
+where $Q$ is a unitary matrix and $T$ is an upper triangular matrix with all eigen values of $A$ in it's diagonal. $Q^{H}$ denotes the conjugate transpose of unitary matrix $Q$. This decomposition is known as Schur Decomposition and the upper triangular matrix $T$ is called Schur form of $A$. The matrix $A$ can have complex eigen values too. But, in our implementation we have used a modified version of the Schur form. The modified Schur form is called Real Schur form of $A$ which is quasi-upper triangular in nature. All the diagonal blocks of real Schur form of $A$ are either $1 \times 1$ for real eigen values or $2 \times 2$ for complex eigen values. If we write the $2 \times 2$ diagonal block as 
+$$\begin{bmatrix}a & b \\ c & d \end{bmatrix} \hspace{0.5cm}  a, b, c, d \in \mathbb{R},\hspace{0.25cm} b < 0, \hspace{0.25cm} a = d$$
+then the two complex eigen values associated with this matrix are $a \pm i\sqrt{\mid bc \mid}$. \\ In our implementation, we have used a numerical mathod known as $QR$ method to compute the Schur decompositon. In this numerical method, we define $A_{k}$ as the upper triangular matrix generated after $k^{th}$ iteration of $QR$ method. In $k^{th}$ iteration, we first perform QR decomposition of $A_{k-1}$ to obtain $A_{k-1} = Q_{k-1}R_{k-1}$. It is to be noted that $QR$ decomposition yields a unitary matrix $Q$ and an upper triangular matrix $R$. Now, we obtain by $A_{k} = R_{k-1}Q_{k-1}$. We start the iterations with $A_{0} = A$. According to a theorem in linear algebra, after infinite iterations, $A_{k}$ will converge to a quasi-upper triangular matrix (as defined in section 1) which will have all eigen values of matrix $A$ on it's diagonal in the form of $1 \times 1$ and $2 \times 2$ blocks. The proof of this is quite involved and since it is not the focus of our project, we are omitting the proof from this documentation. \\ Now that we have obtained the quasi upper triangular matrix $T$ from $A_{k}$, we also have to compute the unitary matrix $Q$. Now, we can write the following equations
+$$A_{0} = Q_{0}R_{0}$$
+$$A_{1} = R_{0}Q_{0}$$
+Since $Q_{0}$ is a unitary matrix from the definition of $QR$ decomposition, we can write $Q_{0}^{H}Q_{0} = I$. Using this fact,
+$$A_{1} = IR_{0}Q_{0} = Q_{0}^{H}Q_{0}R_{0}Q_{0}$$
+$$\implies A_{1} = Q_{0}^{H}(Q_{0}R_{0})Q_{0}$$
+$$\implies A_{1} = Q_{0}^{H}A_{0}Q_{0}$$
+Using similar arguments for $A_{2}$, we can write
+$$A_{2} = Q_{1}^{H}A_{1}Q_{1}$$
+\newpage
+Now, replacing $A_{1}$ with the the expression we just calculated, we get
+$$A_{2} = Q_{1}^{H}Q_{0}^{H}A_{0}Q_{0}Q_{1}$$
+$$\implies A_{2} = (Q_{0}Q_{1})^{H}A_{0}(Q_{0}Q_{1})$$
+Now, if we write the expression in a similar manner for $A_{k}$, we will get
+$$A_{k} = (Q_{0}Q_{1}...Q_{k-1})^{H}A_{0}(Q_{0}Q_{1}...Q_{k-1})$$
+$$\implies A_{0} = (Q_{0}Q_{1}...Q_{k-1})A_{k}(Q_{0}Q_{1}...Q_{k-1})^{H}$$
+Now, we know that $A_{0} = A$ and $A = Q^{H}TQ$. Here $Q$ was a unitary matrix and $T$ was a quasi upper triangular matrix. Now, if we compare this expression with the expression we just computed then we see that LHS is the same for both of them and in RHS, $A_{k} = T$. Moreover, product of 2 unitary matrices is also a unitary matrix. So, we can say that 
+$$Q = (Q_{0}Q_{1}...Q_{k-1})^{H}$$
+Hence, we have obtained the expression for $Q$ matrix. This $Q$ matrix will be required in Parlett Recurrence method. Now, the only part left is the method for $QR$ decomposition. As mentioned in the introduction, there are various ways to perform $QR$ decomposition. Since our main focus is on parallelization of matrix polynomial evaluation, we picked up Given's rotation technique which has a lot of scope for parallelisation. 
+
+The theory of Given's rotation involves quite a deal of geometry. Hence we are omitting the details of the proofs and we will directly explain the algorithm. Now, a Given's matrix can be defined as
+$$G(i, j, \theta) = 
+\begin{bmatrix} 
+1 & ... & 0 & ... & 0 & ... & 0 \\
+\vdots & \ddots & \vdots & & \vdots & & \vdots \\
+0 & ... & c & ... & -s & ... & 0 \\
+\vdots & & \vdots & \ddots & \vdots & & \vdots \\
+0 & ... & s & ... & c & ... & 0 \\
+\vdots & & \vdots & & \vdots & \ddots & \vdots \\
+0 & ... & 0 & ... & 0 & ... & 1 
+\end{bmatrix}$$
+where $c = cos\theta$ and $s = sin\theta$. Now, according to the algorithm, given a matrix $A$, we want to make it upper triangular. This is possible if we make the numbers below the diagonal as $0$. Here is where Given's matrix will help us. Let's say that we want to convert $A_{2, 1}$ to $0$. In this case, we will find such a Given's matrix such that $G(i, j, \theta)A$ has the entry as $0$ at $(2, 1)$ index. Here, we will fix $i = 2, j = 1$ and we have to calculate $\theta$ such that we get the desired result. We came up with an formula which can be proved easily by matrix multiplication.
+$$\theta = tan^{-1}(-A_{ij} / A_{jj})$$
+\newpage
+Now, we will compute the Given's matrices for all the indices below the diagonal. Let's denote these Given's matrices as $G_{21}, G_{31}...G_{n,(n-1)}$. So, for the $QR$ decomposition, we can write
+$$R = G_{n,(n-1)}...G_{31}G_{21}A$$
+$$Q = (G_{n, (n-1)}...G_{31}G_{21})^{H}$$
+The proof of this is quite elaborate and is omitted because our main focus lies on the algorithm and its parallelization. Hence, this completes the theory of all the sub-components of Schur Decomposition. The implementation and parallelization details will be provided in section 3.
 
 \subsection{Sylvester Equation Solver}
-In parlett recurrence the off-diagonal blocks $F_i_j$ are defined as the solution of a Sylvester equation.
-\begin{figure}[H]
- \centering
- \includegraphics[]{sylvester_eq.png}
-\end{figure}
-Hence, this algorithm is used to solve off-diagonal blocks.We know a sylvester equation of form $AX - XB = C$ can be written as $mx = c$, where $m = (I * A - B^t * I)$ (here * is kronecker product) and x, c are obtained by stacking all columns of X and C from right to left. We can solve the equation $mx = c\quad  =>\quad  x = m^(-1)c$\quad  using gauss elimination. X can be obtained by restacking columns of x. We have solved the equation(4) using above steps.
 
+An equation of the form $$AX - XB = C$$ is known as a Sylvester equation. Here $A$ is a square matrix of dimension $p \times p$(say) and $B$ is a square matrix of dimension $q \times q$(say). $C$ is a matrix of dimension $p \times q$ and $X$ is a $p \times q$ matrix which needs to be computed. There exists a standard solution for X for such an equation. This equation can be re-written as $$Kx=b$$ where $K=I_q\bigotimes A- I_p\bigotimes B$ (Here $\bigotimes$ denotes Kronecker product and $I_c$ is a c x c identity matrix) and $$b=\begin{bmatrix}c_1 \\ c_2 \\ . \\ . \end{bmatrix}$$ 
+where $c_1,c_2,...,c_n$ are columns of C from right to left. Similarly, we can write $x$ as
+$$x=\begin{bmatrix}x_1 \\ x_2 \\ . \\ . \end{bmatrix}$$
+where $x_1, x_2, ..., x_n$ are columns of X from right to left. Here, $x$ can be calculated by using Gauss Elimination method. We haven't given the details of Gauss Elimination as it is a pretty well known and standard algorithm to solve system of linear equations. X can then be calculated by reverse stacking the columns of x. 
+This is to be noted that the solution $X$ of the Sylvester equation is unique if and only if the matrices $A$ and $B$ have no common eigen values. This is the primary reason behind the numerical instability of Parlett Recurrence algorithm. The application of Sylvester Equation will be seen in next section.The implementation and parallelization details will be given in section 3.
 
-\subsection{Parlett Recurrence}
-Parlett Recurrence is an elegant way of calculating f for an upper triangular matrix. We start by calculating f for each diagonal block ( we will use paterson-stockmeyer algorithm for this). To calculate F(ij) we will then employ the following recurrence in a bottom-top left-right fashion. 
+\subsection{Blocked Parlett Recurrence}
+The idea behind Parlett Recurrence is to first perform Schur Decomposition to get $T$ from $A = Q^{H}TQ$. Our original problem is to compute $q(A)$ where $A$  is the input matrix. Now, we will compute $q(T)$ first and then we will find $q(A)$ by
+$$q(A) = Q^{H}q(T)Q$$
+Here, $T$ will have diagonal blocks of dimension either $1 \times 1$ or $2 \times 2$. Accordingly, we will divide this quasi-upper triangular matrix into blocks. Diagrammatically, an example of division into blocks can be shown like the following figure
+\begin{center}
+\includegraphics[width=0.30\textwidth]{Blocks.png}
+\end{center}
+Here, red blocks denote the diagonal blocks and the white blocks are the off-diagonal blocks. Now, to compute $q(T)$, we have two steps. Here, we denote $F_{ij}$ as the computed function for the block $T_{ij}$ placed at $(i, j)$ location in the matrix $T$. So, first step is to compute the polynomial $F_{ii}$ for all the diagonal blocks $T_{ii}$. The second step is to compute the polynomial for the off-diagonal elements of $T$.
 
-Due to the denominator term, parlett recurrence breaks down incase of repeated eigenvalues or even for eigenvalues that are very close to each other. A blocked parlett recurrence can be used to handle the case for repeated eigenvalues.
+$F_{ii}$ can be calculated for all diagonal blocks efficiently using Paterson-Stockmeyer algorithm as subroutine. Now, the original relation proposed by Parlett is
+$$f_{ij} = \frac{f_{ii}t_{ij} - t_{ij}f_{jj}}{t_{ii} - t{jj}} + \sum_{k=i+1}^{j-1}\frac{f_{ik}t_{kj} - t_{ik}f_{kj}}{t_{ii} - t_{jj}}$$
+Here, $t_{ij}$ and $f_{ij}$ represents the individual elements of the $T$ and $q(T)$ matrix respectively. From this relation, this is pretty clear that we can't calculate $f_{ij}$ if $t_{ii} = t_{jj}$. This scenario will happen if the input matrix $A$ has repeated eigen values because in that case two entries of the diagonal of real Schur form of $A$ will be equal. This is the reason we said that Parlett Recurrence method is numerically unstable for cases when input matrix $A$ has repeated eigen values.
 
+However, rather than computing each entry seperately, we have implemented a blocked version of the Parlett Recurrence so that we can take advantages of our parallelized matrix multiplication algorithm. But, this version also suffers from repeated eigen value problem because Sylvester Equation can't give unique solution in this case. 
+\newpage
+The blocked Parlett recurrence relation to calculate $F_{ij}$ can be written as follows 
+$$T_{ii}F_{ij} - F_{ij}T_{jj} = F_{ii}T_{ij} - T_{ij}F_{jj} + \sum_{k=i+1}^{j-1}(F_{ik}T_{kj} - T_{ik}F_{kj})$$ 
+
+ Now, this is a Sylvester Equation where we have to compute $F_{ij}$. It can be easily noticed that each off-diagonal block $F_{ij}$ is only dependent on values of blocks to the left of it and below it. Since RHS must be known for solving this Sylvester equation, we have to compute these blocks before computing $F_{ij}$. There emerge two ways to calculate $F$ matrix:
+\begin{enumerate}
+    \item Block diagonal partitioning: If we define diagonal $d'$ to consist of all $F_{ij}$ blocks for which $j = i + d'$ then each diagonal $d'$ is only dependent on diagonals $d''<d'$ (diagonals to the left of d). Blocks within each diagonal can be calculated independently of each other which means they can all be calculated parallely quite efficiently.  
+    \vspace{0.5cm}
+    \item Block column partitioning: We can divide $T$ into blocks column-wise and calculate them in appropriate order sequentially from left to right. 
+\end{enumerate}
+
+We have chosen block diagonal partitioning due to its rather straightforward implementation and more explicit parallelization than column partitioning.
+
+\newpage
 \section{Implementation and Parallelization}
+We have implemented the algorithm from scratch using C++ 17 compiled on GNU G++ compiler. OpenMP was used for the development of parallel algorithms. 
+
+\subsection{Paterson Stockmeyer Algorithm}
+First step is to compute all powers of $A$ till power $p$. The naive way to compute and store these matrices involves p matrix multiplications which is quite expensive. However, we have come up with an efficient algorithm which is as follows:
+\begin{algorithm}
+\caption{}\label{alg:cap}
+\begin{algorithmic}
+% \Require $n \geq 0$
+% \Ensure $y = x^n$
+\State $y \gets 1$
+\State $X \gets x$
+\State $N \gets n$
+\While{$N \neq 0$}
+\If{$N$ is even}
+    \State $X \gets X \times X$
+    \State $N \gets \frac{N}{2}$  \Comment{This is a comment}
+\ElsIf{$N$ is odd}
+    \State $y \gets y \times X$
+    \State $N \gets N - 1$
+\EndIf
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+In this algorithm, 
+
+
+
+All the polynomial coefficients if degree p-1 can be calculated in parallel. Instead of caching $A^2,A^3,..,A^p-1$, we cache $A^2,A^4,..,A^{log_2(p-1)}$. We can then use binary representation of any exponent for calculation in O(log(exponent)) time. We then use Horner's rule to compute the polynomial q(A).
+
 
 \subsection{Schur Decomposition}
 
-
-
-
 \subsection{Sylvester Equation Solver}
 
-
-
-\subsection{Parlett Recurrence}
+\subsection{Blocked Parlett Recurrence}
 
 \section{Evaluation}
-this is evaluation
+
+All the testing and evaluation of the code was done on an Intel i7 10th gen 2.6 GHz processor with 6 physical cores and support for hyperthreading. 
+
 \section{Conclusion}
 
+\section{References}
+initialize an array (powersOfInputMatrix) storing all powers of input matrix upto p.
+initialize q = polynomialDegree-1
+for(; q>=0;q--)
+    initialize an array of complexNumber (temp)
+    for(j = 0; j < polynomialVariable; j++)
+        compute index as polynomialVariable * q + j
+        if(j < degree coefficient matrix) assign coeff as coeffients[index]
+        temp = temp + coeff * powersOfInputMatrix[j]
+
+%===========================================================
+%===========================================================
+
+\bibliographystyle{ieeetr}
+\bibliography{refs}
 
 
-\end{document}
+\end{document} 
