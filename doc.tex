@@ -179,9 +179,13 @@ This is to be noted that the solution $X$ of the Sylvester equation is unique if
 The idea behind Parlett Recurrence is to first perform Schur Decomposition to get $T$ from $A = Q^{H}TQ$. Our original problem is to compute $q(A)$ where $A$  is the input matrix. Now, we will compute $q(T)$ first and then we will find $q(A)$ by
 $$q(A) = Q^{H}q(T)Q$$
 Here, $T$ will have diagonal blocks of dimension either $1 \times 1$ or $2 \times 2$. Accordingly, we will divide this quasi-upper triangular matrix into blocks. Diagrammatically, an example of division into blocks can be shown like the following figure
-\begin{center}
-\includegraphics[width=0.30\textwidth]{Blocks.png}
-\end{center}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.30\textwidth]{Blocks.png}
+    \caption{Block Partitioning}
+\end{figure}
+
 Here, red blocks denote the diagonal blocks and the white blocks are the off-diagonal blocks. Now, to compute $q(T)$, we have two steps. Here, we denote $F_{ij}$ as the computed function for the block $T_{ij}$ placed at $(i, j)$ location in the matrix $T$. So, first step is to compute the polynomial $F_{ii}$ for all the diagonal blocks $T_{ii}$. The second step is to compute the polynomial for the off-diagonal elements of $T$.
 
 $F_{ii}$ can be calculated for all diagonal blocks efficiently using Paterson-Stockmeyer algorithm as subroutine. Now, the original relation proposed by Parlett is
@@ -203,13 +207,20 @@ $$T_{ii}F_{ij} - F_{ij}T_{jj} = F_{ii}T_{ij} - T_{ij}F_{jj} + \sum_{k=i+1}^{j-1}
 We have chosen block diagonal partitioning due to its rather straightforward implementation and more explicit parallelization than column partitioning.
 
 \newpage
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{flowchart.jpeg}
+    \caption{Algorithm Overview}
+\end{figure}
 \section{Implementation and Parallelization}
+
 We have implemented the algorithm from scratch using C++ 17 compiled on GNU G++ compiler. OpenMP was used for the development of parallel algorithms. 
-\begin{center}
-\includegraphics[width=0.70\textwidth]{flowchart.jpeg}
-\end{center}
+
+
+
 \subsection{Paterson Stockmeyer Algorithm}
 First step is to compute all powers of $A$ till power $p$. The naive way to compute and store these matrices involves p matrix multiplications which is quite expensive. However, we have come up with an efficient algorithm which is as follows:
+
 \begin{algorithm}
 \caption{Computing powers of $A$}\label{alg:cap}
 \begin{algorithmic}[1]
@@ -218,6 +229,8 @@ First step is to compute all powers of $A$ till power $p$. The naive way to comp
 \State For all odd powers take the even power which is 1 less than it and then multiply that matrix with $A$
 \end{algorithmic}
 \end{algorithm}
+
+
 
 In this algorithm, we can compute all the powers of $A$ which are not a power of 2 in parallel. Now, we present the Horner's method for Paterson Stockmeyer algorithm which is as follows: 
 
@@ -294,14 +307,18 @@ Sylvester Equation Solver involves computing Kronecker product and Gauss Elimina
 
 We have parallelized both Kronecker product computation and Gauss Elimination. In Kronecker product computation, every entry of the output matrix can be computed independently and hence is done parallely. In Gauss Elimination, when we try to make the elements below the diagonal 0, we notice that we can simultaneously perform elementary row transformations for all the entries in a column below the diagonal. Hence, we have parallelized Gauss elimination in this manner. Apart form these two sub-routines, \textit{column stacking} and \textit{reverse column stacking} sub routines are also parallelized.
 
+\newpage
 \subsection{Blocked Parlett Recurrence}
 
 As already mentioned in section 2, we have performed block diagonal partitioning to compute the off diagonal elements of $q(T)$. In a diagonal of blocks, all blocks can be computed parallely because $F_{ij}$ depends on the computed values to the left and bottom of it only.
 Diagramatically, we can represent the partitioning as
 
-\begin{center}
-\includegraphics[width=0.30\textwidth]{Sylvester_blocks.png}
-\end{center}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.30\textwidth]{Sylvester_blocks.png}
+    \caption{Block Diagonal Partitioning}
+\end{figure}
 
 In the figure all the blocks of same color can be computed in parallel. Hence, we have deployed the same strategy to parallelize computations of off-diagonal elements. 
 
@@ -316,13 +333,44 @@ In the figure all the blocks of same color can be computed in parallel. Hence, w
 \EndFor
 \end{algorithmic}
 \end{algorithm}
+
+\newpage
 \section{Evaluation}
 
 All the testing and evaluation of the code was done on an Intel i7 10th gen 2.6 GHz processor with 6 physical cores and support for hyperthreading. 
 
+\begin{figure}
+    \centering
+    \includegraphics[width={schur.png}
+    \caption{Order of Execution of schur decomposition}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.70\textwidth]{patersonStockmeyer.jpeg}
+    \caption{Order of Execution of Paterson Stockmeyer}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.70\textwidth]{parlett.png}
+    \caption{Order of Execution of Parlett Recurrence}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.70\textwidth]{sylvester.png}
+    \caption{Order of Execution of Sylvester}
+\end{figure}
+\newpage
 \section{Conclusion}
 
-\section{References}
+We have proposed two optimal algorithms for evaluating matrix polynomials. Paterson Stockmeyer is a robust algorithm with time complexity $O(n^3\sqrt{d})$. We explained the sub
+
+
+\newpage
 
 %===========================================================
 %===========================================================
@@ -342,11 +390,11 @@ Wikipedia: QR Algorithm
 \bibitem{wiki2}
 Wikipedia: Givens Rotation
 \bibitem{wiki3}
-Wikipedia: 
-\bibitem{lamport94}
-Padraic Bartlett: Math108B, L5, The Schur Decomposition
-\bibitem{amit}
-Amit Waisel: Parallel Algorithms for Evaluating Matrix Polynomials
+Wikipedia: QR Decomposition
+\bibitem{block}
+Isak Jonsson, Bo Kagstrom: Recursive Blocked Algorithms for Solving Triangular Systems—Part I: One-Sided and Coupled Sylvester-Type Matrix Equations
+\bibitem{schurfor}
+Daniel Kressner: Block Algorithms for reordering standard and generalized schur forms Lapack working note 171
 
 \end{thebibliography}
 
