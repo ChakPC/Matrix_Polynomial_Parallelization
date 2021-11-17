@@ -6,7 +6,7 @@ Optimized and Parallelized Code for Solving Matrix Polynomials
 ### Problem Statement
 Solving the given equation
 <p align="center">
-  <img src="https://latex.codecogs.com/svg.latex?q%28x%29%20%3D%20%5Csum%5Climits_%7Bi%3D1%7D%5Ed%20c_ix%5Ed%20%3D%20c_0%20+%20c_1x%20+%20c_2x%5E2%20+%20...c_dx%5Ed" style="filter: invert(1);"/>
+  <img src="https://user-images.githubusercontent.com/59741135/142240642-d246624d-8940-464a-b9a3-0d3f548a04e4.png" style="filter: invert(1);"/>
 </p>
 
 
