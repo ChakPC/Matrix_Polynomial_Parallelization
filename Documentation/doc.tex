@@ -238,11 +238,11 @@ In this algorithm, we can compute all the powers of $A$ which are not a power of
 \begin{algorithm}
 \caption{Paterson-Stockmeyer Polynomial Evaluation}\label{euclid}
 \begin{algorithmic}[1]
-\State Q = 0
-\State \text{Calculate and store A, $A^{2}$,..., $A^{p-1}$}
- \For{\textt{q = 0 : s-1}}
-     \State {Q_p = {$c_{p.q}.I + c_{p.q+1}.A + c_{q.p+p-1}.A^{p-1}$}}
-     \State {Q = {$Q.A^p + Q_p$} \Comment{Horner's Method}
+\State $Q$ = 0
+\State \text{Calculate and store $A$, $A^{2}$,..., $A^{p}$}
+ \For{\textt{q = s-1 : 0}}
+     \State {$Q_p$ = {$c_{p.q}.I + c_{p.q+1}.A + ... + c_{q.p+p-1}.A^{p-1}$}}
+     \State {$Q$ = {$Q.A^p + Q_p$} \Comment{Horner's Method}
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -364,7 +364,7 @@ All the testing and evaluation of the code was done on an Intel i7 10th gen 2.6 
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{patersonStockmeyer.jpeg}
+    \includegraphics[width=0.9\textwidth]{paterson.png}
     \caption{Order of Execution of Paterson Stockmeyer}
 \end{figure}
 
